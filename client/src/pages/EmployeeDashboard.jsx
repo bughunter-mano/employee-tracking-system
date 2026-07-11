@@ -6,9 +6,12 @@ function EmployeeDashboard() {
   const [githubLink, setGithubLink] = useState('');
   const [screenshotUrl, setScreenshotUrl] = useState('');
   const [message, setMessage] = useState('');
+  const [attendanceMessage, setAttendanceMessage] = useState('');
+  const [attendanceMarked, setAttendanceMarked] = useState(false);
 
   useEffect(() => {
     fetchProfile();
+    checkAttendanceStatus();
   }, []);
 
   const fetchProfile = async () => {
@@ -17,6 +20,30 @@ function EmployeeDashboard() {
       setProfile(res.data);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const checkAttendanceStatus = async () => {
+    try {
+      const res = await api.get('/employee/attendance-history');
+      const today = new Date().toISOString().split('T')[0];
+      const markedToday = res.data.some((record) => {
+        const recordDate = new Date(record.date).toISOString().split('T')[0];
+        return recordDate === today;
+      });
+      setAttendanceMarked(markedToday);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleMarkAttendance = async () => {
+    try {
+      await api.post('/employee/mark-attendance');
+      setAttendanceMessage('Attendance marked successfully!');
+      setAttendanceMarked(true);
+    } catch (err) {
+      setAttendanceMessage(err.response?.data?.message || 'Failed to mark attendance');
     }
   };
 
@@ -43,6 +70,21 @@ function EmployeeDashboard() {
         <p className={`text-4xl font-bold ${profile.performance_score <= 60 ? 'text-red-500' : 'text-green-600'}`}>
           {profile.performance_score}%
         </p>
+      </div>
+
+      <div className="bg-white shadow p-6 rounded-lg mb-6">
+        <h2 className="text-xl font-semibold mb-4">Attendance</h2>
+        {attendanceMessage && <p className="mb-4 text-blue-600">{attendanceMessage}</p>}
+        {attendanceMarked ? (
+          <p className="text-green-600 font-medium">✓ Attendance marked for today</p>
+        ) : (
+          <button
+            onClick={handleMarkAttendance}
+            className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+          >
+            Mark Attendance
+          </button>
+        )}
       </div>
 
       <div className="bg-white shadow p-6 rounded-lg">

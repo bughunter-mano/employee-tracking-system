@@ -1,3 +1,4 @@
+const { markAttendance, checkTodayAttendance, getAttendanceHistory } = require('../models/attendanceModel');
 const { findUserById } = require('../models/userModel');
 const { addProofOfWork, getWorkHistory, checkTodaySubmission } = require('../models/workModel');
 
@@ -51,3 +52,31 @@ const myHistory = async (req, res) => {
 };
 
 module.exports = { getMyProfile, submitWork, myHistory };
+// Attendance mark karna
+const markMyAttendance = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const today = new Date().toISOString().split('T')[0];
+
+    const existing = await checkTodayAttendance(userId, today);
+    if (existing) {
+      return res.status(400).json({ message: 'Attendance already marked for today' });
+    }
+
+    const attendance = await markAttendance(userId, today);
+    res.status(201).json({ message: 'Attendance marked successfully', attendance });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Attendance history dekhna
+const myAttendanceHistory = async (req, res) => {
+  try {
+    const history = await getAttendanceHistory(req.user.id);
+    res.status(200).json(history);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+module.exports = { getMyProfile, submitWork, myHistory, markMyAttendance, myAttendanceHistory };
