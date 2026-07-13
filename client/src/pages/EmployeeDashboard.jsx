@@ -65,6 +65,12 @@ function EmployeeDashboard() {
     <div className="p-8 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Welcome, {profile.name}</h1>
 
+      {profile.performance_score <= 60 && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+          ⚠️ Warning: Your performance score is low. Please submit your work regularly to avoid account suspension.
+        </div>
+      )}
+
       <div className="bg-white shadow p-6 rounded-lg mb-6">
         <p className="text-lg">Performance Score:</p>
         <p className={`text-4xl font-bold ${profile.performance_score <= 60 ? 'text-red-500' : 'text-green-600'}`}>
