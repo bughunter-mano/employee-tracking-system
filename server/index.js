@@ -6,8 +6,10 @@ require('./config/db');
 
 const authRoutes = require('./routes/authRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const testRoutes = require('./routes/testRoutes');
 const { runDailyScoreCheck } = require('./controllers/scoreController');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 const app = express();
 app.use(cors());
@@ -20,6 +22,8 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/employee', employeeRoutes);
 app.use('/api/test', testRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Cron Job: Har roz raat 12:01 baje chalega
 // Format: minute hour day month weekday

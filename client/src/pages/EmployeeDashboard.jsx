@@ -8,10 +8,12 @@ function EmployeeDashboard() {
   const [message, setMessage] = useState('');
   const [attendanceMessage, setAttendanceMessage] = useState('');
   const [attendanceMarked, setAttendanceMarked] = useState(false);
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     fetchProfile();
     checkAttendanceStatus();
+    fetchNotifications();
   }, []);
 
   const fetchProfile = async () => {
@@ -32,6 +34,15 @@ function EmployeeDashboard() {
         return recordDate === today;
       });
       setAttendanceMarked(markedToday);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await api.get('/notifications/my-notifications');
+      setNotifications(res.data);
     } catch (err) {
       console.error(err);
     }
@@ -92,6 +103,22 @@ function EmployeeDashboard() {
           </button>
         )}
       </div>
+
+      {notifications.length > 0 && (
+        <div className="bg-white shadow p-6 rounded-lg mb-6">
+          <h2 className="text-xl font-semibold mb-4">Notifications</h2>
+          <ul className="space-y-2">
+            {notifications.map((notif) => (
+              <li key={notif.id} className="border-b pb-2 text-gray-700">
+                {notif.message}
+                <span className="block text-xs text-gray-400">
+                  {new Date(notif.created_at).toLocaleString()}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="bg-white shadow p-6 rounded-lg">
         <h2 className="text-xl font-semibold mb-4">Submit Today's Work</h2>
