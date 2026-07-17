@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axiosConfig';
+import Navbar from '../components/Navbar';
 
 function AdminDashboard() {
   const [employees, setEmployees] = useState([]);
@@ -66,10 +67,7 @@ function AdminDashboard() {
   const handleSendNotification = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/notifications/send', {
-        message: notifMessage,
-        recipientIds: 'all'
-      });
+      await api.post('/notifications/send', { message: notifMessage, recipientIds: 'all' });
       setNotifStatus('Notification sent to all employees!');
       setNotifMessage('');
     } catch (err) {
@@ -77,88 +75,161 @@ function AdminDashboard() {
     }
   };
 
+  const statusBadge = (status) => {
+    const styles = {
+      active: 'bg-emerald-50 text-emerald-700',
+      warning: 'bg-amber-50 text-amber-700',
+      blocked: 'bg-red-50 text-red-700'
+    };
+    return `px-2.5 py-1 rounded-full text-xs font-medium capitalize ${styles[status] || 'bg-slate-100 text-slate-600'}`;
+  };
+
+  const avgScore = employees.length
+    ? Math.round(employees.reduce((sum, e) => sum + e.performance_score, 0) / employees.length)
+    : 0;
+  const atRiskCount = employees.filter((e) => e.performance_score <= 60).length;
+
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-        <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          {showAddForm ? 'Cancel' : '+ Add Employee'}
-        </button>
-      </div>
+    <div className="min-h-screen bg-slate-50">
+      <Navbar userName="Admin" role="admin" />
 
-      <div className="bg-white shadow p-4 rounded-lg mb-6">
-        <p className="text-lg">Total Employees: <span className="font-bold">{employees.length}</span></p>
-      </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+          <h1 className="text-2xl font-bold text-slate-800">Admin Dashboard</h1>
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2.5 rounded-lg transition-colors w-fit"
+          >
+            {showAddForm ? 'Cancel' : '+ Add Employee'}
+          </button>
+        </div>
 
-      {showAddForm && (
-        <div className="bg-white shadow p-6 rounded-lg mb-6">
-          <h2 className="text-xl font-semibold mb-4">Add New Employee</h2>
-          {message && <p className="mb-4 text-blue-600">{message}</p>}
-          <form onSubmit={handleAddEmployee}>
-            <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full p-2 border rounded mb-4" required />
-            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-2 border rounded mb-4" required />
-            <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-2 border rounded mb-4" required />
-            <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-              Add Employee
+        {/* Stats Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+            <p className="text-sm text-slate-500 mb-1">Total Employees</p>
+            <p className="text-3xl font-bold text-slate-800">{employees.length}</p>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+            <p className="text-sm text-slate-500 mb-1">Average Score</p>
+            <p className="text-3xl font-bold text-indigo-600">{avgScore}%</p>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+            <p className="text-sm text-slate-500 mb-1">At Risk (≤60%)</p>
+            <p className="text-3xl font-bold text-red-500">{atRiskCount}</p>
+          </div>
+        </div>
+
+        {showAddForm && (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6">
+            <h2 className="text-lg font-semibold text-slate-800 mb-4">Add New Employee</h2>
+            {message && (
+              <p className="text-sm text-indigo-600 bg-indigo-50 px-4 py-2 rounded-lg mb-4">{message}</p>
+            )}
+            <form onSubmit={handleAddEmployee} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <input
+                type="text" placeholder="Name" value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              />
+              <input
+                type="email" placeholder="Email" value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              />
+              <input
+                type="password" placeholder="Password" value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              />
+              <button
+                type="submit"
+                className="sm:col-span-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors"
+              >
+                Add Employee
+              </button>
+            </form>
+          </div>
+        )}
+
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-slate-800 mb-4">Send Notification to All Employees</h2>
+          {notifStatus && (
+            <p className="text-sm text-indigo-600 bg-indigo-50 px-4 py-2 rounded-lg mb-4">{notifStatus}</p>
+          )}
+          <form onSubmit={handleSendNotification} className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              placeholder="Type your message..."
+              value={notifMessage}
+              onChange={(e) => setNotifMessage(e.target.value)}
+              className="flex-1 px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
+            <button
+              type="submit"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2.5 rounded-lg transition-colors"
+            >
+              Send to All
             </button>
           </form>
         </div>
-      )}
 
-      <div className="bg-white shadow p-6 rounded-lg mb-6">
-        <h2 className="text-xl font-semibold mb-4">Send Notification to All Employees</h2>
-        {notifStatus && <p className="mb-4 text-blue-600">{notifStatus}</p>}
-        <form onSubmit={handleSendNotification} className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Type your message..."
-            value={notifMessage}
-            onChange={(e) => setNotifMessage(e.target.value)}
-            className="flex-1 p-2 border rounded"
-            required
-          />
-          <button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-            Send
-          </button>
-        </form>
-      </div>
-
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-3">Name</th>
-              <th className="p-3">Email</th>
-              <th className="p-3">Score</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {employees.map((emp) => (
-              <tr key={emp.id} className="border-t">
-                <td className="p-3">{emp.name}</td>
-                <td className="p-3">{emp.email}</td>
-                <td className={`p-3 font-bold ${emp.performance_score <= 60 ? 'text-red-500' : 'text-green-600'}`}>
-                  {emp.performance_score}%
-                </td>
-                <td className="p-3 capitalize">{emp.status}</td>
-                <td className="p-3 space-x-2">
-                  <button onClick={() => handleScoreChange(emp.id, emp.performance_score)} className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 text-sm">
-                    Edit Score
-                  </button>
-                  <button onClick={() => handleDelete(emp.id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {employees.length === 0 && <p className="p-6 text-center text-gray-500">No employees yet.</p>}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-slate-50 text-slate-500 text-sm">
+                <tr>
+                  <th className="p-4 font-medium">Name</th>
+                  <th className="p-4 font-medium">Email</th>
+                  <th className="p-4 font-medium">Score</th>
+                  <th className="p-4 font-medium">Status</th>
+                  <th className="p-4 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {employees.map((emp) => (
+                  <tr key={emp.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="p-4 font-medium text-slate-700">{emp.name}</td>
+                    <td className="p-4 text-slate-500 text-sm">{emp.email}</td>
+                    <td className="p-4">
+                      <span className={`font-semibold ${
+                        emp.performance_score <= 30 ? 'text-red-600' :
+                        emp.performance_score <= 60 ? 'text-amber-500' :
+                        'text-emerald-600'
+                      }`}>
+                        {emp.performance_score}%
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <span className={statusBadge(emp.status)}>{emp.status}</span>
+                    </td>
+                    <td className="p-4 space-x-2 whitespace-nowrap">
+                      <button
+                        onClick={() => handleScoreChange(emp.id, emp.performance_score)}
+                        className="bg-amber-50 hover:bg-amber-100 text-amber-700 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Edit Score
+                      </button>
+                      <button
+                        onClick={() => handleDelete(emp.id)}
+                        className="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {employees.length === 0 && (
+            <p className="p-10 text-center text-slate-400">No employees yet. Add your first one above.</p>
+          )}
+        </div>
       </div>
     </div>
   );
