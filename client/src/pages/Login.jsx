@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axiosConfig';
 
 function Login() {
@@ -65,7 +65,7 @@ function Login() {
             />
           </div>
 
-          <div className="mb-6">
+          <div className="mb-2">
             <label className="block text-sm font-medium text-slate-600 mb-1.5">Password</label>
             <input
               type="password"
@@ -75,6 +75,12 @@ function Login() {
               className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
               required
             />
+          </div>
+
+          <div className="text-right mb-6">
+            <Link to="/forgot-password" className="text-sm text-indigo-600 hover:underline">
+              Forgot password?
+            </Link>
           </div>
 
           <button

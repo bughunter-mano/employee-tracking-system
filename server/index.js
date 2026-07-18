@@ -19,7 +19,6 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-// General rate limiter — har IP se 100 requests per 15 min
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -27,7 +26,6 @@ const generalLimiter = rateLimit({
 });
 app.use(generalLimiter);
 
-// Login/signup ke liye zyada sakht limit (brute-force se bachne ke liye)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
@@ -42,7 +40,10 @@ app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/employee', employeeRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/test', testRoutes);
+
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/api/test', testRoutes);
+}
 
 cron.schedule('1 0 * * *', () => {
   console.log('Cron job triggered at 12:01 AM');

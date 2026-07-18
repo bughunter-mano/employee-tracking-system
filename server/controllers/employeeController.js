@@ -1,6 +1,6 @@
-const { markAttendance, checkTodayAttendance, getAttendanceHistory } = require('../models/attendanceModel');
 const { findUserById } = require('../models/userModel');
 const { addProofOfWork, getWorkHistory, checkTodaySubmission } = require('../models/workModel');
+const { markAttendance, checkTodayAttendance, getAttendanceHistory } = require('../models/attendanceModel');
 
 // Apna profile/score dekhna
 const getMyProfile = async (req, res) => {
@@ -18,12 +18,13 @@ const getMyProfile = async (req, res) => {
   }
 };
 
-// Proof of work submit karna
+// Proof of work submit karna (real image upload ke sath)
 const submitWork = async (req, res) => {
   try {
     const userId = req.user.id;
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-    const { screenshotUrl, githubLink } = req.body;
+    const today = new Date().toISOString().split('T')[0];
+    const { githubLink } = req.body;
+    const screenshotUrl = req.file ? req.file.path : null;
 
     if (!screenshotUrl && !githubLink) {
       return res.status(400).json({ message: 'Screenshot or GitHub link is required' });
@@ -51,7 +52,6 @@ const myHistory = async (req, res) => {
   }
 };
 
-module.exports = { getMyProfile, submitWork, myHistory };
 // Attendance mark karna
 const markMyAttendance = async (req, res) => {
   try {
@@ -79,4 +79,11 @@ const myAttendanceHistory = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-module.exports = { getMyProfile, submitWork, myHistory, markMyAttendance, myAttendanceHistory };
+
+module.exports = {
+  getMyProfile,
+  submitWork,
+  myHistory,
+  markMyAttendance,
+  myAttendanceHistory
+};

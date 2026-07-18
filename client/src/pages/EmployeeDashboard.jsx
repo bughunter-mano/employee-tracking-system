@@ -5,16 +5,22 @@ import Navbar from '../components/Navbar';
 function EmployeeDashboard() {
   const [profile, setProfile] = useState(null);
   const [githubLink, setGithubLink] = useState('');
-  const [screenshotUrl, setScreenshotUrl] = useState('');
+  const [screenshotFile, setScreenshotFile] = useState(null);
   const [message, setMessage] = useState('');
   const [attendanceMessage, setAttendanceMessage] = useState('');
   const [attendanceMarked, setAttendanceMarked] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [workHistory, setWorkHistory] = useState([]);
+  const [attendanceHistory, setAttendanceHistory] = useState([]);
+  const [activeTab, setActiveTab] = useState('work');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchProfile();
     checkAttendanceStatus();
     fetchNotifications();
+    fetchWorkHistory();
+    fetchAttendanceHistory();
   }, []);
 
   const fetchProfile = async () => {
@@ -49,11 +55,30 @@ function EmployeeDashboard() {
     }
   };
 
+  const fetchWorkHistory = async () => {
+    try {
+      const res = await api.get('/employee/history');
+      setWorkHistory(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchAttendanceHistory = async () => {
+    try {
+      const res = await api.get('/employee/attendance-history');
+      setAttendanceHistory(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleMarkAttendance = async () => {
     try {
       await api.post('/employee/mark-attendance');
       setAttendanceMessage('Attendance marked successfully!');
       setAttendanceMarked(true);
+      fetchAttendanceHistory();
     } catch (err) {
       setAttendanceMessage(err.response?.data?.message || 'Failed to mark attendance');
     }
@@ -61,13 +86,23 @@ function EmployeeDashboard() {
 
   const handleSubmitWork = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
-      await api.post('/employee/submit-work', { screenshotUrl, githubLink });
+      const formData = new FormData();
+      if (screenshotFile) formData.append('screenshot', screenshotFile);
+      if (githubLink) formData.append('githubLink', githubLink);
+
+      await api.post('/employee/submit-work', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       setMessage('Work submitted successfully!');
       setGithubLink('');
-      setScreenshotUrl('');
+      setScreenshotFile(null);
+      fetchWorkHistory();
     } catch (err) {
       setMessage(err.response?.data?.message || 'Submission failed');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -107,7 +142,6 @@ function EmployeeDashboard() {
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-          {/* Score Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex items-center gap-5">
             <svg className="w-20 h-20 -rotate-90 shrink-0" viewBox="0 0 100 100">
               <circle cx="50" cy="50" r="42" strokeWidth="10" className="stroke-slate-100" fill="none" />
@@ -126,7 +160,6 @@ function EmployeeDashboard() {
             </div>
           </div>
 
-          {/* Attendance Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col justify-center">
             <p className="text-sm text-slate-500 mb-3">Today's Attendance</p>
             {attendanceMessage && <p className="text-sm text-indigo-600 mb-2">{attendanceMessage}</p>}
@@ -165,20 +198,19 @@ function EmployeeDashboard() {
           </div>
         )}
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6">
           <h2 className="text-lg font-semibold text-slate-800 mb-4">Submit Today's Work</h2>
           {message && (
             <p className="text-sm text-indigo-600 bg-indigo-50 px-4 py-2 rounded-lg mb-4">{message}</p>
           )}
           <form onSubmit={handleSubmitWork} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-600 mb-1.5">Screenshot URL</label>
+              <label className="block text-sm font-medium text-slate-600 mb-1.5">Screenshot</label>
               <input
-                type="text"
-                placeholder="https://..."
-                value={screenshotUrl}
-                onChange={(e) => setScreenshotUrl(e.target.value)}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setScreenshotFile(e.target.files[0])}
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm"
               />
             </div>
             <div>
@@ -193,11 +225,71 @@ function EmployeeDashboard() {
             </div>
             <button
               type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-lg transition-colors"
+              disabled={submitting}
+              className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-medium px-5 py-2.5 rounded-lg transition-colors"
             >
-              Submit Work
+              {submitting ? 'Submitting...' : 'Submit Work'}
             </button>
           </form>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+          <div className="flex gap-2 mb-4 border-b border-slate-100">
+            <button
+              onClick={() => setActiveTab('work')}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'work' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500'
+              }`}
+            >
+              Work History
+            </button>
+            <button
+              onClick={() => setActiveTab('attendance')}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'attendance' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500'
+              }`}
+            >
+              Attendance History
+            </button>
+          </div>
+
+          {activeTab === 'work' && (
+            <div className="space-y-3">
+              {workHistory.length === 0 && <p className="text-slate-400 text-sm">No submissions yet.</p>}
+              {workHistory.map((item) => (
+                <div key={item.id} className="flex justify-between items-center border-b border-slate-50 pb-3 last:border-0">
+                  <div>
+                    <p className="text-sm font-medium text-slate-700">{new Date(item.date).toLocaleDateString()}</p>
+                    <div className="flex gap-3 mt-1">
+                      {item.screenshot_url && (
+                        <a href={item.screenshot_url} target="_blank" rel="noreferrer" className="text-xs text-indigo-600 underline">
+                          Screenshot
+                        </a>
+                      )}
+                      {item.github_link && (
+                        <a href={item.github_link} target="_blank" rel="noreferrer" className="text-xs text-indigo-600 underline">
+                          GitHub Link
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full">Submitted</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'attendance' && (
+            <div className="space-y-3">
+              {attendanceHistory.length === 0 && <p className="text-slate-400 text-sm">No attendance records yet.</p>}
+              {attendanceHistory.map((item) => (
+                <div key={item.id} className="flex justify-between items-center border-b border-slate-50 pb-3 last:border-0">
+                  <p className="text-sm font-medium text-slate-700">{new Date(item.date).toLocaleDateString()}</p>
+                  <p className="text-xs text-slate-400">{new Date(item.check_in_time).toLocaleTimeString()}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

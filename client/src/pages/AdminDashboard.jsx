@@ -11,6 +11,20 @@ function AdminDashboard() {
   const [message, setMessage] = useState('');
   const [notifMessage, setNotifMessage] = useState('');
   const [notifStatus, setNotifStatus] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const [sendToAll, setSendToAll] = useState(true);
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  const [editingEmployee, setEditingEmployee] = useState(null);
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+
+  const [viewingEmployee, setViewingEmployee] = useState(null);
+
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [scoreEditEmployee, setScoreEditEmployee] = useState(null);
+  const [newScoreValue, setNewScoreValue] = useState('');
 
   useEffect(() => {
     fetchEmployees();
@@ -40,36 +54,81 @@ function AdminDashboard() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this employee?')) return;
+  // Delete
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/admin/employees/${id}`);
+      await api.delete(`/admin/employees/${deleteConfirmId}`);
+      setDeleteConfirmId(null);
       fetchEmployees();
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleScoreChange = async (id, currentScore) => {
-    const newScore = window.prompt('Enter new score (0-100):', currentScore);
-    if (newScore === null) return;
+  // Score edit
+  const openScoreEdit = (emp) => {
+    setScoreEditEmployee(emp);
+    setNewScoreValue(emp.performance_score);
+  };
+
+  const saveScoreChange = async () => {
     try {
-      await api.put(`/admin/employees/${id}/score`, {
-        newScore: parseInt(newScore),
+      await api.put(`/admin/employees/${scoreEditEmployee.id}/score`, {
+        newScore: parseInt(newScoreValue),
         reason: 'Manual adjustment by Admin'
       });
+      setScoreEditEmployee(null);
       fetchEmployees();
     } catch (err) {
       console.error(err);
     }
+  };
+
+  // Edit name/email
+  const openEditModal = (emp) => {
+    setEditingEmployee(emp);
+    setEditName(emp.name);
+    setEditEmail(emp.email);
+  };
+
+  const handleEditSave = async (e) => {
+    e.preventDefault();
+    try {
+      await api.put(`/admin/employees/${editingEmployee.id}`, { name: editName, email: editEmail });
+      setEditingEmployee(null);
+      fetchEmployees();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update employee');
+    }
+  };
+
+  // Detail view
+  const viewEmployeeDetail = async (id) => {
+    try {
+      const res = await api.get(`/admin/employees/${id}`);
+      setViewingEmployee(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Notifications
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
   };
 
   const handleSendNotification = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/notifications/send', { message: notifMessage, recipientIds: 'all' });
-      setNotifStatus('Notification sent to all employees!');
+      await api.post('/notifications/send', {
+        message: notifMessage,
+        recipientIds: sendToAll ? 'all' : selectedIds
+      });
+      setNotifStatus('Notification sent successfully!');
       setNotifMessage('');
+      setSelectedIds([]);
     } catch (err) {
       setNotifStatus(err.response?.data?.message || 'Failed to send notification');
     }
@@ -88,6 +147,12 @@ function AdminDashboard() {
     ? Math.round(employees.reduce((sum, e) => sum + e.performance_score, 0) / employees.length)
     : 0;
   const atRiskCount = employees.filter((e) => e.performance_score <= 60).length;
+
+  const filteredEmployees = employees.filter(
+    (emp) =>
+      emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      emp.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -120,6 +185,7 @@ function AdminDashboard() {
           </div>
         </div>
 
+        {/* Add Employee Form */}
         {showAddForm && (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6">
             <h2 className="text-lg font-semibold text-slate-800 mb-4">Add New Employee</h2>
@@ -155,11 +221,45 @@ function AdminDashboard() {
           </div>
         )}
 
+        {/* Notifications */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6">
-          <h2 className="text-lg font-semibold text-slate-800 mb-4">Send Notification to All Employees</h2>
+          <h2 className="text-lg font-semibold text-slate-800 mb-4">Send Notification</h2>
           {notifStatus && (
             <p className="text-sm text-indigo-600 bg-indigo-50 px-4 py-2 rounded-lg mb-4">{notifStatus}</p>
           )}
+
+          <div className="flex items-center gap-2 mb-4">
+            <input
+              type="checkbox"
+              id="sendToAll"
+              checked={sendToAll}
+              onChange={(e) => setSendToAll(e.target.checked)}
+              className="w-4 h-4"
+            />
+            <label htmlFor="sendToAll" className="text-sm text-slate-600">Send to all employees</label>
+          </div>
+
+          {!sendToAll && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {employees.map((emp) => (
+                <label
+                  key={emp.id}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm cursor-pointer border ${
+                    selectedIds.includes(emp.id) ? 'bg-indigo-50 border-indigo-300 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-600'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(emp.id)}
+                    onChange={() => toggleSelect(emp.id)}
+                    className="w-3.5 h-3.5"
+                  />
+                  {emp.name}
+                </label>
+              ))}
+            </div>
+          )}
+
           <form onSubmit={handleSendNotification} className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
@@ -173,11 +273,23 @@ function AdminDashboard() {
               type="submit"
               className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2.5 rounded-lg transition-colors"
             >
-              Send to All
+              Send
             </button>
           </form>
         </div>
 
+        {/* Search */}
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search employees by name or email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full sm:w-80 px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        {/* Employee Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -191,9 +303,16 @@ function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {employees.map((emp) => (
+                {filteredEmployees.map((emp) => (
                   <tr key={emp.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-4 font-medium text-slate-700">{emp.name}</td>
+                    <td className="p-4">
+                      <button
+                        onClick={() => viewEmployeeDetail(emp.id)}
+                        className="font-medium text-indigo-600 hover:underline"
+                      >
+                        {emp.name}
+                      </button>
+                    </td>
                     <td className="p-4 text-slate-500 text-sm">{emp.email}</td>
                     <td className="p-4">
                       <span className={`font-semibold ${
@@ -209,13 +328,19 @@ function AdminDashboard() {
                     </td>
                     <td className="p-4 space-x-2 whitespace-nowrap">
                       <button
-                        onClick={() => handleScoreChange(emp.id, emp.performance_score)}
+                        onClick={() => openEditModal(emp)}
+                        className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => openScoreEdit(emp)}
                         className="bg-amber-50 hover:bg-amber-100 text-amber-700 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
                       >
                         Edit Score
                       </button>
                       <button
-                        onClick={() => handleDelete(emp.id)}
+                        onClick={() => setDeleteConfirmId(emp.id)}
                         className="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
                       >
                         Delete
@@ -226,11 +351,162 @@ function AdminDashboard() {
               </tbody>
             </table>
           </div>
-          {employees.length === 0 && (
-            <p className="p-10 text-center text-slate-400">No employees yet. Add your first one above.</p>
+          {filteredEmployees.length === 0 && (
+            <p className="p-10 text-center text-slate-400">No employees found.</p>
           )}
         </div>
       </div>
+
+      {/* Edit Name/Email Modal */}
+      {editingEmployee && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold text-slate-800 mb-4">Edit Employee</h3>
+            <form onSubmit={handleEditSave} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1.5">Name</label>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1.5">Email</label>
+                <input
+                  type="email"
+                  value={editEmail}
+                  onChange={(e) => setEditEmail(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingEmployee(null)}
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-lg font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-medium transition-colors"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Employee Detail Modal */}
+      {viewingEmployee && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-800">{viewingEmployee.user.name}</h3>
+                <p className="text-sm text-slate-500">{viewingEmployee.user.email}</p>
+              </div>
+              <button onClick={() => setViewingEmployee(null)} className="text-slate-400 hover:text-slate-600">✕</button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mb-5">
+              <div className="bg-slate-50 rounded-lg p-3">
+                <p className="text-xs text-slate-500">Score</p>
+                <p className="text-xl font-bold text-slate-800">{viewingEmployee.user.performance_score}%</p>
+              </div>
+              <div className="bg-slate-50 rounded-lg p-3">
+                <p className="text-xs text-slate-500">Status</p>
+                <p className="text-xl font-bold text-slate-800 capitalize">{viewingEmployee.user.status}</p>
+              </div>
+            </div>
+
+            <h4 className="text-sm font-semibold text-slate-700 mb-2">Recent Work Submissions</h4>
+            <div className="space-y-2 mb-5">
+              {viewingEmployee.workHistory.length === 0 && <p className="text-slate-400 text-sm">No submissions.</p>}
+              {viewingEmployee.workHistory.map((w) => (
+                <div key={w.id} className="text-sm border-b border-slate-50 pb-2 flex justify-between">
+                  <span>{new Date(w.date).toLocaleDateString()}</span>
+                  {w.github_link && <a href={w.github_link} target="_blank" rel="noreferrer" className="text-indigo-600 underline text-xs">Link</a>}
+                </div>
+              ))}
+            </div>
+
+            <h4 className="text-sm font-semibold text-slate-700 mb-2">Recent Attendance</h4>
+            <div className="space-y-2">
+              {viewingEmployee.attendanceHistory.length === 0 && <p className="text-slate-400 text-sm">No records.</p>}
+              {viewingEmployee.attendanceHistory.map((a) => (
+                <div key={a.id} className="text-sm border-b border-slate-50 pb-2 flex justify-between">
+                  <span>{new Date(a.date).toLocaleDateString()}</span>
+                  <span className="text-slate-400 text-xs">{new Date(a.check_in_time).toLocaleTimeString()}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirm Modal */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm text-center">
+            <h3 className="text-lg font-semibold text-slate-800 mb-2">Delete Employee?</h3>
+            <p className="text-sm text-slate-500 mb-6">This action cannot be undone.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-lg font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-lg font-medium transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Score Edit Modal */}
+      {scoreEditEmployee && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
+            <h3 className="text-lg font-semibold text-slate-800 mb-4">
+              Update Score — {scoreEditEmployee.name}
+            </h3>
+            <input
+              type="number"
+              min="0"
+              max="100"
+              value={newScoreValue}
+              onChange={(e) => setNewScoreValue(e.target.value)}
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-4"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => setScoreEditEmployee(null)}
+                className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-lg font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveScoreChange}
+                className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-medium transition-colors"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
