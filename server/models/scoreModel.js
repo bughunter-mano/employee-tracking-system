@@ -1,38 +1,53 @@
-const pool = require('../config/db');
+const mongoose = require('mongoose');
+const { User } = require('./userModel');
+const { ProofOfWork } = require('./workModel');
+require('../config/db');
 
-// Saare active employees nikalta hai (sirf role = employee, admin nahi)
+const scoreHistorySchema = new mongoose.Schema({
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  old_score: { type: Number, required: true },
+  new_score: { type: Number, required: true },
+  reason: { type: String, required: true },
+  changed_by: { type: String, required: true }
+}, {
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+scoreHistorySchema.virtual('id').get(function() {
+  return this._id.toHexString();
+});
+
+const ScoreHistory = mongoose.models.ScoreHistory || mongoose.model('ScoreHistory', scoreHistorySchema);
+
 const getAllEmployees = async () => {
-  const result = await pool.query(
-    "SELECT * FROM users WHERE role = 'employee'"
-  );
-  return result.rows;
+  return await User.find({ role: 'employee' });
 };
 
-// Check karta hai kal (given date) proof-of-work submit hua tha ya nahi
 const hasSubmittedOnDate = async (userId, date) => {
-  const result = await pool.query(
-    'SELECT * FROM proof_of_work WHERE user_id = $1 AND date = $2',
-    [userId, date]
-  );
-  return result.rows.length > 0;
+  const result = await ProofOfWork.findOne({ user_id: userId, date });
+  return !!result;
 };
 
-// Score update karta hai aur status bhi (active/warning/blocked)
 const updateScore = async (userId, newScore, newStatus) => {
-  const result = await pool.query(
-    'UPDATE users SET performance_score = $1, status = $2 WHERE id = $3 RETURNING *',
-    [newScore, newStatus, userId]
+  return await User.findByIdAndUpdate(
+    userId,
+    { performance_score: newScore, status: newStatus },
+    { new: true }
   );
-  return result.rows[0];
 };
 
-// Score history mein ek record daalta hai (audit trail ke liye)
 const logScoreChange = async (userId, oldScore, newScore, reason, changedBy) => {
-  const result = await pool.query(
-    'INSERT INTO score_history (user_id, old_score, new_score, reason, changed_by) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-    [userId, oldScore, newScore, reason, changedBy]
-  );
-  return result.rows[0];
+  const log = new ScoreHistory({
+    user_id: userId,
+    old_score: oldScore,
+    new_score: newScore,
+    reason,
+    changed_by: changedBy
+  });
+  await log.save();
+  return log;
 };
 
-module.exports = { getAllEmployees, hasSubmittedOnDate, updateScore, logScoreChange };
+module.exports = { ScoreHistory, getAllEmployees, hasSubmittedOnDate, updateScore, logScoreChange };

@@ -2,8 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const pool = require('../config/db');
-const { createUser, findUserByEmail } = require('../models/userModel');
+const { User, createUser, findUserByEmail } = require('../models/userModel');
 
 // SIGNUP
 const signup = async (req, res) => {
@@ -75,10 +74,9 @@ const forgotPassword = async (req, res) => {
     const resetToken = crypto.randomBytes(32).toString('hex');
     const expiry = new Date(Date.now() + 3600000);
 
-    await pool.query(
-      'UPDATE users SET reset_token = $1, reset_token_expiry = $2 WHERE id = $3',
-      [resetToken, expiry, user.id]
-    );
+    user.reset_token = resetToken;
+    user.reset_token_expiry = expiry;
+    await user.save();
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -106,20 +104,20 @@ const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { newPassword } = req.body;
 
-    const result = await pool.query(
-      'SELECT * FROM users WHERE reset_token = $1 AND reset_token_expiry > NOW()',
-      [token]
-    );
+    const user = await User.findOne({
+      reset_token: token,
+      reset_token_expiry: { $gt: new Date() }
+    });
 
-    if (result.rows.length === 0) {
+    if (!user) {
       return res.status(400).json({ message: 'Invalid or expired reset link' });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await pool.query(
-      'UPDATE users SET password_hash = $1, reset_token = NULL, reset_token_expiry = NULL WHERE id = $2',
-      [hashedPassword, result.rows[0].id]
-    );
+    user.password_hash = hashedPassword;
+    user.reset_token = null;
+    user.reset_token_expiry = null;
+    await user.save();
 
     res.status(200).json({ message: 'Password reset successfully' });
   } catch (error) {

@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const cron = require('node-cron');
 require('./config/db');
 
 const authRoutes = require('./routes/authRoutes');
@@ -45,10 +44,19 @@ if (process.env.NODE_ENV !== 'production') {
   app.use('/api/test', testRoutes);
 }
 
-cron.schedule('1 0 * * *', () => {
-  console.log('Cron job triggered at 12:01 AM');
-  runDailyScoreCheck();
+app.get('/api/cron/daily-score-check', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  await runDailyScoreCheck();
+  res.status(200).json({ message: 'Daily score check completed' });
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+module.exports = app;

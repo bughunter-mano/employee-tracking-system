@@ -1,30 +1,40 @@
-const pool = require('../config/db');
+const mongoose = require('mongoose');
+require('../config/db');
 
-// Proof of work save karta hai
+const workSchema = new mongoose.Schema({
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  date: { type: String, required: true },
+  screenshot_url: { type: String, default: null },
+  github_link: { type: String, default: null }
+}, {
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+workSchema.virtual('id').get(function() {
+  return this._id.toHexString();
+});
+
+const ProofOfWork = mongoose.models.ProofOfWork || mongoose.model('ProofOfWork', workSchema);
+
 const addProofOfWork = async (userId, date, screenshotUrl, githubLink) => {
-  const result = await pool.query(
-    'INSERT INTO proof_of_work (user_id, date, screenshot_url, github_link) VALUES ($1, $2, $3, $4) RETURNING *',
-    [userId, date, screenshotUrl, githubLink]
-  );
-  return result.rows[0];
+  const work = new ProofOfWork({
+    user_id: userId,
+    date,
+    screenshot_url: screenshotUrl,
+    github_link: githubLink
+  });
+  await work.save();
+  return work;
 };
 
-// User ki saari history nikalta hai
 const getWorkHistory = async (userId) => {
-  const result = await pool.query(
-    'SELECT * FROM proof_of_work WHERE user_id = $1 ORDER BY date DESC',
-    [userId]
-  );
-  return result.rows;
+  return await ProofOfWork.find({ user_id: userId }).sort({ date: -1 });
 };
 
-// Check karta hai aaj already submit ho chuka hai ya nahi
 const checkTodaySubmission = async (userId, date) => {
-  const result = await pool.query(
-    'SELECT * FROM proof_of_work WHERE user_id = $1 AND date = $2',
-    [userId, date]
-  );
-  return result.rows[0];
+  return await ProofOfWork.findOne({ user_id: userId, date });
 };
 
-module.exports = { addProofOfWork, getWorkHistory, checkTodaySubmission };
+module.exports = { ProofOfWork, addProofOfWork, getWorkHistory, checkTodaySubmission };

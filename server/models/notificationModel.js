@@ -1,21 +1,30 @@
-const pool = require('../config/db');
+const mongoose = require('mongoose');
+require('../config/db');
 
-// Ek employee ko notification bhejna
+const notificationSchema = new mongoose.Schema({
+  sender_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  receiver_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  message: { type: String, required: true }
+}, {
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+notificationSchema.virtual('id').get(function() {
+  return this._id.toHexString();
+});
+
+const Notification = mongoose.models.Notification || mongoose.model('Notification', notificationSchema);
+
 const sendNotification = async (senderId, receiverId, message) => {
-  const result = await pool.query(
-    'INSERT INTO notifications (sender_id, receiver_id, message) VALUES ($1, $2, $3) RETURNING *',
-    [senderId, receiverId, message]
-  );
-  return result.rows[0];
+  const notification = new Notification({ sender_id: senderId, receiver_id: receiverId, message });
+  await notification.save();
+  return notification;
 };
 
-// Employee apni notifications dekhe
 const getMyNotifications = async (userId) => {
-  const result = await pool.query(
-    'SELECT * FROM notifications WHERE receiver_id = $1 ORDER BY created_at DESC',
-    [userId]
-  );
-  return result.rows;
+  return await Notification.find({ receiver_id: userId }).sort({ created_at: -1 });
 };
 
-module.exports = { sendNotification, getMyNotifications };
+module.exports = { Notification, sendNotification, getMyNotifications };
