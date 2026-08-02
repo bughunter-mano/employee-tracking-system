@@ -1,10 +1,127 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/hero_bg.jpg';
 
 function LandingPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('employee');
+  const canvasRef = useRef(null);
+  const heroRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+
+    let width = (canvas.width = heroRef.current?.offsetWidth || window.innerWidth);
+    let height = (canvas.height = heroRef.current?.offsetHeight || 600);
+
+    const handleResize = () => {
+      if (heroRef.current) {
+        width = canvas.width = heroRef.current.offsetWidth;
+        height = canvas.height = heroRef.current.offsetHeight;
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    const mouse = { x: width / 2, y: height / 2, targetX: width / 2, targetY: height / 2, isInside: false };
+
+    const handleMouseMove = (e) => {
+      if (!heroRef.current) return;
+      const rect = heroRef.current.getBoundingClientRect();
+      mouse.targetX = e.clientX - rect.left;
+      mouse.targetY = e.clientY - rect.top;
+      mouse.isInside = true;
+    };
+
+    const handleMouseLeave = () => {
+      mouse.isInside = false;
+    };
+
+    const heroElem = heroRef.current;
+    if (heroElem) {
+      heroElem.addEventListener('mousemove', handleMouseMove);
+      heroElem.addEventListener('mouseleave', handleMouseLeave);
+    }
+
+    const particleCount = 45;
+    const particles = [];
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: (Math.random() - 0.5) * 0.8,
+        radius: Math.random() * 2.5 + 1.5,
+        alpha: Math.random() * 0.5 + 0.2
+      });
+    }
+
+    const render = () => {
+      mouse.x += (mouse.targetX - mouse.x) * 0.1;
+      mouse.y += (mouse.targetY - mouse.y) * 0.1;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw Cursor Glow Spotlight
+      if (mouse.isInside) {
+        const glowGradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 220);
+        glowGradient.addColorStop(0, 'rgba(126, 34, 206, 0.25)');
+        glowGradient.addColorStop(0.4, 'rgba(99, 102, 241, 0.12)');
+        glowGradient.addColorStop(1, 'rgba(243, 238, 255, 0)');
+        ctx.fillStyle = glowGradient;
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, 220, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Update & Draw Interactive Particles
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        const dx = mouse.x - p.x;
+        const dy = mouse.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 120 && mouse.isInside) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(mouse.x, mouse.y);
+          ctx.strokeStyle = `rgba(126, 34, 206, ${0.35 * (1 - dist / 120)})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          p.x -= (dx / dist) * 0.5;
+          p.y -= (dy / dist) * 0.5;
+        }
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(109, 40, 217, ${p.alpha})`;
+        ctx.fill();
+      }
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', handleResize);
+      if (heroElem) {
+        heroElem.removeEventListener('mousemove', handleMouseMove);
+        heroElem.removeEventListener('mouseleave', handleMouseLeave);
+      }
+    };
+  }, []);
 
   return (
     <div className="min-h-screen lavender-bg text-purple-950 selection:bg-purple-200 selection:text-purple-900 font-sans">
@@ -47,143 +164,156 @@ function LandingPage() {
         </div>
       </header>
 
-      {/* Hero Section with Custom Background Image & Overlay */}
+      {/* Hero Section with Interactive Cursor Movement Canvas & Background Image */}
       <section 
-        className="relative pt-8 pb-16 px-4 sm:px-6 bg-cover bg-center bg-no-repeat overflow-hidden"
+        ref={heroRef}
+        className="relative min-h-[calc(100vh-73px)] flex items-center py-12 px-4 sm:px-6 bg-cover bg-center bg-no-repeat overflow-hidden cursor-default"
         style={{ backgroundImage: `url(${heroBg})` }}
       >
+        {/* Interactive Mouse Particle Canvas */}
+        <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-10"></canvas>
+
         {/* Soft Lavender Backdrop Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-purple-50/80 via-purple-50/70 to-purple-100/90 backdrop-blur-[2px]"></div>
 
-        <div className="relative z-10 max-w-[1300px] mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-10">
-
-            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-purple-950 leading-[1.18] mb-4 drop-shadow-sm">
+        <div className="relative z-10 max-w-[1300px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          
+          {/* Left Column: Text & CTAs */}
+          <div className="lg:col-span-5 flex flex-col justify-center text-left">
+            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-purple-950 leading-[1.15] mb-5 drop-shadow-sm">
               Next-Gen <span className="bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Employee Tracking</span> & Performance Portal
             </h1>
 
-            <p className="text-sm sm:text-base text-purple-900/80 font-semibold leading-relaxed mb-6 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base text-purple-900/80 font-semibold leading-relaxed mb-8 max-w-xl">
               Streamline daily attendance check-ins, automated score calculations, work screenshot & GitHub proof verification, and executive admin analytics in one beautiful workspace.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 mb-6">
               <button
                 onClick={() => navigate('/login')}
-                className="w-full sm:w-auto bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-xs sm:text-sm px-7 py-3.5 rounded-2xl shadow-lg shadow-purple-700/30 transition hover:-translate-y-0.5 active:scale-95"
+                className="bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-xs sm:text-sm px-7 py-4 rounded-2xl shadow-lg shadow-purple-700/30 transition hover:-translate-y-0.5 active:scale-95 text-center"
               >
                 Get Started Now — Login Portal
               </button>
               <a
                 href="#features"
-                className="w-full sm:w-auto bg-white/90 hover:bg-white text-purple-950 font-bold text-xs sm:text-sm px-6 py-3.5 rounded-2xl border border-purple-200 transition text-center shadow-md backdrop-blur-md"
+                className="bg-white/90 hover:bg-white text-purple-950 font-bold text-xs sm:text-sm px-6 py-4 rounded-2xl border border-purple-200 transition text-center shadow-md backdrop-blur-md"
               >
-                Explore Live Demo ↓
+                Explore Features ↓
               </a>
             </div>
-          </div>
 
-          {/* Hero Interactive UI Card Mockup */}
-          <div className="bg-white/95 backdrop-blur-2xl rounded-3xl border border-purple-200/90 p-6 sm:p-8 shadow-2xl shadow-purple-950/15 max-w-5xl mx-auto relative overflow-hidden group">
-            <div className="flex items-center justify-between border-b border-purple-100 pb-4 mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-                <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
-                <span className="text-xs font-bold text-purple-900/50 ml-2">emptrack-labs.internal.app</span>
-              </div>
-
-            {/* Toggle Preview View */}
-            <div className="flex bg-purple-50 p-1 rounded-full border border-purple-100 text-xs font-bold">
-              <button
-                onClick={() => setActiveTab('employee')}
-                className={`px-4 py-1.5 rounded-full transition ${activeTab === 'employee' ? 'bg-purple-700 text-white shadow-sm' : 'text-purple-800/70'}`}
-              >
-                Employee View
-              </button>
-              <button
-                onClick={() => setActiveTab('admin')}
-                className={`px-4 py-1.5 rounded-full transition ${activeTab === 'admin' ? 'bg-purple-700 text-white shadow-sm' : 'text-purple-800/70'}`}
-              >
-                Admin Executive View
-              </button>
+            <div className="flex items-center gap-4 text-xs font-bold text-purple-900/60 pt-2 border-t border-purple-200/60">
+              <span className="flex items-center gap-1.5"><span className="text-emerald-500">✓</span> Free Demo Accounts</span>
+              <span className="flex items-center gap-1.5"><span className="text-emerald-500">✓</span> Instant Auto-Seeding</span>
             </div>
           </div>
 
-          {activeTab === 'employee' ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {/* Profile Card Mock */}
-              <div className="bg-gradient-to-br from-purple-900 to-indigo-950 text-white p-5 rounded-2xl flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] font-bold bg-white/20 px-2.5 py-0.5 rounded-full">⭐ Top Tier Employee</span>
-                  <div className="mt-4 flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-purple-400 flex items-center justify-center font-extrabold text-xl text-purple-950">
-                      J
-                    </div>
+          {/* Right Column: Interactive UI Card Mockup */}
+          <div className="lg:col-span-7 w-full">
+            <div className="bg-white/95 backdrop-blur-2xl rounded-3xl border border-purple-200/90 p-5 sm:p-7 shadow-2xl shadow-purple-950/15 relative overflow-hidden group">
+              <div className="flex items-center justify-between border-b border-purple-100 pb-4 mb-5">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-amber-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
+                  <span className="text-xs font-bold text-purple-900/50 ml-1.5">emptrack-labs.internal.app</span>
+                </div>
+
+                {/* Toggle Preview View */}
+                <div className="flex bg-purple-50 p-1 rounded-full border border-purple-100 text-xs font-bold">
+                  <button
+                    onClick={() => setActiveTab('employee')}
+                    className={`px-3 py-1 rounded-full transition ${activeTab === 'employee' ? 'bg-purple-700 text-white shadow-sm' : 'text-purple-800/70'}`}
+                  >
+                    Employee View
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('admin')}
+                    className={`px-3 py-1 rounded-full transition ${activeTab === 'admin' ? 'bg-purple-700 text-white shadow-sm' : 'text-purple-800/70'}`}
+                  >
+                    Admin Executive
+                  </button>
+                </div>
+              </div>
+
+              {activeTab === 'employee' ? (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Profile Card Mock */}
+                  <div className="bg-gradient-to-br from-purple-900 to-indigo-950 text-white p-4 rounded-2xl flex flex-col justify-between">
                     <div>
-                      <p className="font-bold text-sm">John Doe</p>
-                      <p className="text-[11px] text-purple-300">employee@emptrack.com</p>
+                      <span className="text-[9px] font-bold bg-white/20 px-2 py-0.5 rounded-full">⭐ Top Employee</span>
+                      <div className="mt-3 flex items-center gap-2.5">
+                        <div className="w-10 h-10 rounded-xl bg-purple-400 flex items-center justify-center font-extrabold text-lg text-purple-950">
+                          J
+                        </div>
+                        <div>
+                          <p className="font-bold text-xs">John Doe</p>
+                          <p className="text-[10px] text-purple-300">employee@emptrack.com</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-5 pt-2 border-t border-white/10 flex justify-between items-center text-[11px]">
+                      <span className="text-purple-200">Score</span>
+                      <span className="font-extrabold text-emerald-400">100%</span>
+                    </div>
+                  </div>
+
+                  {/* Weekly Bar Chart Mock */}
+                  <div className="bg-purple-50/60 p-4 rounded-2xl border border-purple-100 flex flex-col justify-between">
+                    <div>
+                      <p className="text-[9px] font-bold uppercase text-purple-900/60">Weekly Work</p>
+                      <p className="text-lg font-extrabold text-purple-950">5.1 h <span className="text-[10px] text-purple-500 font-medium">/ week</span></p>
+                    </div>
+                    <div className="flex items-end justify-between gap-1 h-14 mt-2">
+                      <div className="w-full bg-purple-200 rounded-md h-6"></div>
+                      <div className="w-full bg-purple-200 rounded-md h-10"></div>
+                      <div className="w-full bg-purple-200 rounded-md h-5"></div>
+                      <div className="w-full bg-purple-700 rounded-md h-14"></div>
+                      <div className="w-full bg-purple-200 rounded-md h-8"></div>
+                    </div>
+                  </div>
+
+                  {/* Today's Check-in Donut Ring Mock */}
+                  <div className="bg-purple-900 text-white p-4 rounded-2xl flex flex-col justify-between">
+                    <div className="flex justify-between items-center">
+                      <p className="text-[11px] font-bold">Check-in</p>
+                      <span className="text-[9px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 px-1.5 py-0.5 rounded-full font-bold">✓ Marked</span>
+                    </div>
+                    <div className="my-2 text-center">
+                      <p className="text-2xl font-extrabold text-emerald-400">100%</p>
+                      <p className="text-[10px] text-purple-200">Attendance Logged</p>
+                    </div>
+                    <div className="bg-white/10 p-1.5 rounded-xl text-center text-[10px] font-semibold">
+                      Proof: GitHub Link
                     </div>
                   </div>
                 </div>
-                <div className="mt-6 pt-3 border-t border-white/10 flex justify-between items-center text-xs">
-                  <span className="text-purple-200">Performance Score</span>
-                  <span className="font-extrabold text-emerald-400">100%</span>
+              ) : (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="p-3 bg-purple-50/60 rounded-2xl border border-purple-100">
+                      <p className="text-[9px] font-bold text-purple-900/60 uppercase">Total Employees</p>
+                      <p className="text-xl font-extrabold text-purple-950">68</p>
+                    </div>
+                    <div className="p-3 bg-purple-50/60 rounded-2xl border border-purple-100">
+                      <p className="text-[9px] font-bold text-purple-900/60 uppercase">Average Score</p>
+                      <p className="text-xl font-extrabold text-purple-700">94%</p>
+                    </div>
+                    <div className="p-3 bg-purple-50/60 rounded-2xl border border-purple-100">
+                      <p className="text-[9px] font-bold text-purple-900/60 uppercase">At Risk</p>
+                      <p className="text-xl font-extrabold text-red-600">2</p>
+                    </div>
+                  </div>
+                  <div className="p-3.5 bg-purple-950 text-white rounded-2xl flex items-center justify-between text-[11px]">
+                    <span>📣 Broadcast: <strong>"Q3 Performance Review"</strong></span>
+                    <span className="bg-purple-700 text-white px-2.5 py-0.5 rounded-full font-bold text-[10px]">Sent to 68 Employees</span>
+                  </div>
                 </div>
-              </div>
-
-              {/* Weekly Bar Chart Mock */}
-              <div className="bg-purple-50/50 p-5 rounded-2xl border border-purple-100 flex flex-col justify-between">
-                <div>
-                  <p className="text-[10px] font-bold uppercase text-purple-900/60">Weekly Work Progress</p>
-                  <p className="text-xl font-extrabold text-purple-950">5.1 h <span className="text-xs text-purple-500 font-medium">/ week</span></p>
-                </div>
-                <div className="flex items-end justify-between gap-1.5 h-16 mt-3">
-                  <div className="w-full bg-purple-200 rounded-md h-8"></div>
-                  <div className="w-full bg-purple-200 rounded-md h-12"></div>
-                  <div className="w-full bg-purple-200 rounded-md h-6"></div>
-                  <div className="w-full bg-purple-700 rounded-md h-16"></div>
-                  <div className="w-full bg-purple-200 rounded-md h-10"></div>
-                </div>
-              </div>
-
-              {/* Today's Check-in Donut Ring Mock */}
-              <div className="bg-purple-900 text-white p-5 rounded-2xl flex flex-col justify-between">
-                <div className="flex justify-between items-center">
-                  <p className="text-xs font-bold">Daily Check-in</p>
-                  <span className="text-[10px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full font-bold">✓ Marked</span>
-                </div>
-                <div className="my-3 text-center">
-                  <p className="text-3xl font-extrabold text-emerald-400">100%</p>
-                  <p className="text-[11px] text-purple-200 mt-0.5">Attendance Recorded</p>
-                </div>
-                <div className="bg-white/10 p-2 rounded-xl text-center text-xs font-semibold">
-                  Proof Submitted: Screenshot + GitHub Link
-                </div>
-              </div>
+              )}
             </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="p-4 bg-purple-50/60 rounded-2xl border border-purple-100">
-                  <p className="text-[10px] font-bold text-purple-900/60 uppercase">Total Employees</p>
-                  <p className="text-2xl font-extrabold text-purple-950">68</p>
-                </div>
-                <div className="p-4 bg-purple-50/60 rounded-2xl border border-purple-100">
-                  <p className="text-[10px] font-bold text-purple-900/60 uppercase">Average Score</p>
-                  <p className="text-2xl font-extrabold text-purple-700">94%</p>
-                </div>
-                <div className="p-4 bg-purple-50/60 rounded-2xl border border-purple-100">
-                  <p className="text-[10px] font-bold text-purple-900/60 uppercase">At Risk Employees</p>
-                  <p className="text-2xl font-extrabold text-red-600">2</p>
-                </div>
-              </div>
-              <div className="p-4 bg-purple-950 text-white rounded-2xl flex items-center justify-between text-xs">
-                <span>📣 Broadcast Announcement System: <strong>"Q3 Performance Review Completed"</strong></span>
-                <span className="bg-purple-700 text-white px-3 py-1 rounded-full font-bold">Sent to 68 Employees</span>
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+
         </div>
       </section>
 
