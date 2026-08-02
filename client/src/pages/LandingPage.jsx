@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import heroBg from '../assets/hero_bg.jpg';
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ function LandingPage() {
     <div className="min-h-screen lavender-bg text-purple-950 selection:bg-purple-200 selection:text-purple-900 font-sans">
       
       {/* Top Floating Navbar */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-purple-100/80 px-6 py-4">
+      <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-xl border-b border-purple-100/90 px-6 py-4 shadow-sm">
         <div className="max-w-[1300px] mx-auto flex items-center justify-between">
           
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
@@ -46,47 +47,54 @@ function LandingPage() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative pt-16 pb-20 px-4 sm:px-6 max-w-[1300px] mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 bg-purple-100/80 border border-purple-200/80 px-4 py-1.5 rounded-full text-xs font-extrabold text-purple-800 mb-6 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-purple-600 animate-ping"></span>
-            <span>EmpTrack Pro 2.0 • Craftive Workspace System</span>
-          </div>
+      {/* Hero Section with Custom Background Image & Overlay */}
+      <section 
+        className="relative pt-16 pb-24 px-4 sm:px-6 bg-cover bg-center bg-no-repeat overflow-hidden"
+        style={{ backgroundImage: `url(${heroBg})` }}
+      >
+        {/* Soft Lavender Backdrop Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-50/80 via-purple-50/70 to-purple-100/90 backdrop-blur-[2px]"></div>
 
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-purple-950 leading-[1.15] mb-6">
-            Next-Gen <span className="bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-500 bg-clip-text text-transparent">Employee Tracking</span> & Performance Portal
-          </h1>
-
-          <p className="text-base sm:text-lg text-purple-900/70 font-medium leading-relaxed mb-8 max-w-2xl mx-auto">
-            Streamline daily attendance check-ins, automated score calculations, work screenshot & GitHub proof verification, and executive admin analytics in one beautiful workspace.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button
-              onClick={() => navigate('/login')}
-              className="w-full sm:w-auto bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-sm px-8 py-4 rounded-2xl shadow-xl shadow-purple-700/30 transition hover:-translate-y-0.5 active:scale-95"
-            >
-              Get Started Now — Login Portal
-            </button>
-            <a
-              href="#features"
-              className="w-full sm:w-auto bg-white hover:bg-purple-50/60 text-purple-950 font-bold text-sm px-7 py-4 rounded-2xl border border-purple-200/80 transition text-center shadow-sm"
-            >
-              Explore Live Demo ↓
-            </a>
-          </div>
-        </div>
-
-        {/* Hero Interactive UI Card Mockup (Craftive Design System Preview) */}
-        <div className="bg-white/90 backdrop-blur-2xl rounded-3xl border border-purple-200/80 p-6 sm:p-8 shadow-2xl shadow-purple-950/10 max-w-5xl mx-auto relative overflow-hidden group">
-          <div className="flex items-center justify-between border-b border-purple-100 pb-4 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-red-400"></div>
-              <div className="w-3 h-3 rounded-full bg-amber-400"></div>
-              <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
-              <span className="text-xs font-bold text-purple-900/50 ml-2">emptrack-labs.internal.app</span>
+        <div className="relative z-10 max-w-[1300px] mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-2 bg-white/90 border border-purple-200 px-4.5 py-1.5 rounded-full text-xs font-extrabold text-purple-900 mb-6 shadow-md backdrop-blur-md">
+              <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-ping"></span>
+              <span>EmpTrack Pro 2.0 • Craftive Workspace System</span>
             </div>
+
+            <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-purple-950 leading-[1.15] mb-6 drop-shadow-sm">
+              Next-Gen <span className="bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Employee Tracking</span> & Performance Portal
+            </h1>
+
+            <p className="text-base sm:text-lg text-purple-900/80 font-semibold leading-relaxed mb-8 max-w-2xl mx-auto">
+              Streamline daily attendance check-ins, automated score calculations, work screenshot & GitHub proof verification, and executive admin analytics in one beautiful workspace.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <button
+                onClick={() => navigate('/login')}
+                className="w-full sm:w-auto bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-sm px-8 py-4 rounded-2xl shadow-xl shadow-purple-700/30 transition hover:-translate-y-0.5 active:scale-95"
+              >
+                Get Started Now — Login Portal
+              </button>
+              <a
+                href="#features"
+                className="w-full sm:w-auto bg-white/90 hover:bg-white text-purple-950 font-bold text-sm px-7 py-4 rounded-2xl border border-purple-200 transition text-center shadow-md backdrop-blur-md"
+              >
+                Explore Live Demo ↓
+              </a>
+            </div>
+          </div>
+
+          {/* Hero Interactive UI Card Mockup */}
+          <div className="bg-white/95 backdrop-blur-2xl rounded-3xl border border-purple-200/90 p-6 sm:p-8 shadow-2xl shadow-purple-950/15 max-w-5xl mx-auto relative overflow-hidden group">
+            <div className="flex items-center justify-between border-b border-purple-100 pb-4 mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                <div className="w-3 h-3 rounded-full bg-amber-400"></div>
+                <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
+                <span className="text-xs font-bold text-purple-900/50 ml-2">emptrack-labs.internal.app</span>
+              </div>
 
             {/* Toggle Preview View */}
             <div className="flex bg-purple-50 p-1 rounded-full border border-purple-100 text-xs font-bold">
@@ -179,6 +187,7 @@ function LandingPage() {
               </div>
             </div>
           )}
+        </div>
         </div>
       </section>
 
