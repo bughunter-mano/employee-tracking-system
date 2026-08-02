@@ -49,37 +49,33 @@ function LandingPage() {
 
       {/* Hero Section with Custom Background Image & Overlay */}
       <section 
-        className="relative pt-16 pb-24 px-4 sm:px-6 bg-cover bg-center bg-no-repeat overflow-hidden"
+        className="relative pt-8 pb-16 px-4 sm:px-6 bg-cover bg-center bg-no-repeat overflow-hidden"
         style={{ backgroundImage: `url(${heroBg})` }}
       >
         {/* Soft Lavender Backdrop Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-purple-50/80 via-purple-50/70 to-purple-100/90 backdrop-blur-[2px]"></div>
 
         <div className="relative z-10 max-w-[1300px] mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 bg-white/90 border border-purple-200 px-4.5 py-1.5 rounded-full text-xs font-extrabold text-purple-900 mb-6 shadow-md backdrop-blur-md">
-              <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-ping"></span>
-              <span>EmpTrack Pro 2.0 • Craftive Workspace System</span>
-            </div>
+          <div className="text-center max-w-3xl mx-auto mb-10">
 
-            <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-purple-950 leading-[1.15] mb-6 drop-shadow-sm">
+            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-purple-950 leading-[1.18] mb-4 drop-shadow-sm">
               Next-Gen <span className="bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Employee Tracking</span> & Performance Portal
             </h1>
 
-            <p className="text-base sm:text-lg text-purple-900/80 font-semibold leading-relaxed mb-8 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base text-purple-900/80 font-semibold leading-relaxed mb-6 max-w-2xl mx-auto">
               Streamline daily attendance check-ins, automated score calculations, work screenshot & GitHub proof verification, and executive admin analytics in one beautiful workspace.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5">
               <button
                 onClick={() => navigate('/login')}
-                className="w-full sm:w-auto bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-sm px-8 py-4 rounded-2xl shadow-xl shadow-purple-700/30 transition hover:-translate-y-0.5 active:scale-95"
+                className="w-full sm:w-auto bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-xs sm:text-sm px-7 py-3.5 rounded-2xl shadow-lg shadow-purple-700/30 transition hover:-translate-y-0.5 active:scale-95"
               >
                 Get Started Now — Login Portal
               </button>
               <a
                 href="#features"
-                className="w-full sm:w-auto bg-white/90 hover:bg-white text-purple-950 font-bold text-sm px-7 py-4 rounded-2xl border border-purple-200 transition text-center shadow-md backdrop-blur-md"
+                className="w-full sm:w-auto bg-white/90 hover:bg-white text-purple-950 font-bold text-xs sm:text-sm px-6 py-3.5 rounded-2xl border border-purple-200 transition text-center shadow-md backdrop-blur-md"
               >
                 Explore Live Demo ↓
               </a>
