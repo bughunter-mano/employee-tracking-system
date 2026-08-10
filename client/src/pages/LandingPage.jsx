@@ -414,6 +414,230 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* ================= HOW IT WORKS SECTION (#how-it-works) ================= */}
+      <section id="how-it-works" className="py-20 px-4 sm:px-6 bg-white/70 border-y border-purple-100/80 backdrop-blur-md">
+        <div className="max-w-[1300px] mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="text-xs font-extrabold uppercase tracking-widest bg-purple-100 text-purple-800 px-3.5 py-1 rounded-full border border-purple-200">
+              Workflow Guide
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-purple-950 tracking-tight mt-3 mb-4">
+              How AuraPulse OS Works
+            </h2>
+            <p className="text-sm text-purple-900/70 font-medium">
+              Four simple steps to automate workforce performance and daily check-in workflows.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+            
+            {/* Step 1 */}
+            <div className="bg-white p-6 rounded-3xl border border-purple-100 shadow-sm relative group hover:border-purple-300 transition">
+              <span className="w-10 h-10 rounded-2xl bg-purple-700 text-white font-extrabold text-sm flex items-center justify-center mb-5 shadow-md shadow-purple-700/20">
+                01
+              </span>
+              <h3 className="text-base font-extrabold text-purple-950 mb-2">Role Sign-In</h3>
+              <p className="text-xs text-purple-800/70 font-medium leading-relaxed mb-4">
+                Sign in using role-based authentication or click demo buttons for instant access.
+              </p>
+              <button
+                onClick={() => navigate('/login')}
+                className="text-xs font-bold text-purple-700 hover:underline flex items-center gap-1"
+              >
+                Try Portal Login ➔
+              </button>
+            </div>
+
+            {/* Step 2 */}
+            <div className="bg-white p-6 rounded-3xl border border-purple-100 shadow-sm relative group hover:border-purple-300 transition">
+              <span className="w-10 h-10 rounded-2xl bg-indigo-600 text-white font-extrabold text-sm flex items-center justify-center mb-5 shadow-md shadow-indigo-600/20">
+                02
+              </span>
+              <h3 className="text-base font-extrabold text-purple-950 mb-2">Daily Check-In</h3>
+              <p className="text-xs text-purple-800/70 font-medium leading-relaxed mb-4">
+                One-click check-in logs exact date and timestamp to verify team attendance.
+              </p>
+              <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-xl">✓ Timestamped</span>
+            </div>
+
+            {/* Step 3 */}
+            <div className="bg-white p-6 rounded-3xl border border-purple-100 shadow-sm relative group hover:border-purple-300 transition">
+              <span className="w-10 h-10 rounded-2xl bg-purple-900 text-white font-extrabold text-sm flex items-center justify-center mb-5 shadow-md shadow-purple-900/20">
+                03
+              </span>
+              <h3 className="text-base font-extrabold text-purple-950 mb-2">Submit Proof</h3>
+              <p className="text-xs text-purple-800/70 font-medium leading-relaxed mb-4">
+                Upload work screenshots and attach GitHub repository links for manager verification.
+              </p>
+              <span className="text-xs font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-xl">🖼️ Proof Attached</span>
+            </div>
+
+            {/* Step 4 */}
+            <div className="bg-white p-6 rounded-3xl border border-purple-100 shadow-sm relative group hover:border-purple-300 transition">
+              <span className="w-10 h-10 rounded-2xl bg-emerald-600 text-white font-extrabold text-sm flex items-center justify-center mb-5 shadow-md shadow-emerald-600/20">
+                04
+              </span>
+              <h3 className="text-base font-extrabold text-purple-950 mb-2">Score Analytics</h3>
+              <p className="text-xs text-purple-800/70 font-medium leading-relaxed mb-4">
+                Automated scoring engine updates performance ratings and team leaderboard rankings.
+              </p>
+              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl">⚡ Score Calculated</span>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ================= ANALYTICS SHOWCASE SECTION (#analytics) ================= */}
+      <section id="analytics" className="py-20 px-4 sm:px-6 max-w-[1300px] mx-auto">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <span className="text-xs font-extrabold uppercase tracking-widest bg-purple-100 text-purple-800 px-3.5 py-1 rounded-full border border-purple-200">
+            Real-Time Intelligence
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-purple-950 tracking-tight mt-3 mb-4">
+            Real-Time Workforce Analytics
+          </h2>
+          <p className="text-sm text-purple-900/70 font-medium">
+            Gain complete visibility into attendance compliance, score trends, and submission verification.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          {/* Card A */}
+          <div className="bg-white p-7 rounded-3xl border border-purple-100 shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-xs font-extrabold uppercase text-purple-900/60">Performance Distribution</span>
+                <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Active</span>
+              </div>
+              <div className="my-4 text-center">
+                <p className="text-4xl font-extrabold text-purple-700">94%</p>
+                <p className="text-xs text-purple-900/60 font-semibold mt-1">Average Team Performance</p>
+              </div>
+              <div className="space-y-2 text-xs font-semibold pt-2">
+                <div className="flex justify-between text-purple-950">
+                  <span>Top Performers (&gt;90%)</span>
+                  <span className="font-extrabold text-purple-700">82%</span>
+                </div>
+                <div className="flex justify-between text-purple-950">
+                  <span>Standard Performers (60-90%)</span>
+                  <span className="font-extrabold text-indigo-600">15%</span>
+                </div>
+                <div className="flex justify-between text-purple-950">
+                  <span>At-Risk (&lt;60%)</span>
+                  <span className="font-extrabold text-red-500">3%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Card B */}
+          <div className="bg-white p-7 rounded-3xl border border-purple-100 shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-xs font-extrabold uppercase text-purple-900/60">Work Verification Log</span>
+                <span className="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Cloudinary + GitHub</span>
+              </div>
+              <div className="my-4 text-center">
+                <p className="text-4xl font-extrabold text-indigo-600">100%</p>
+                <p className="text-xs text-purple-900/60 font-semibold mt-1">Screenshot & Link Verification</p>
+              </div>
+              <p className="text-xs text-purple-800/70 font-medium leading-relaxed pt-2">
+                Every work submission is linked to Cloudinary media storage and verified GitHub repositories for audit compliance.
+              </p>
+            </div>
+          </div>
+
+          {/* Card C */}
+          <div className="bg-white p-7 rounded-3xl border border-purple-100 shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-xs font-extrabold uppercase text-purple-900/60">Automated Cron Engine</span>
+                <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Daily Audit</span>
+              </div>
+              <div className="my-4 text-center">
+                <p className="text-4xl font-extrabold text-purple-950">24/7</p>
+                <p className="text-xs text-purple-900/60 font-semibold mt-1">Automated Score Logic</p>
+              </div>
+              <p className="text-xs text-purple-800/70 font-medium leading-relaxed pt-2">
+                System automatically checks daily submission records and applies transparent score adjustments when reports are missed.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ================= TECH STACK SECTION (#tech) ================= */}
+      <section id="tech" className="py-20 px-4 sm:px-6 bg-white/70 border-y border-purple-100/80 backdrop-blur-md">
+        <div className="max-w-[1300px] mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="text-xs font-extrabold uppercase tracking-widest bg-purple-100 text-purple-800 px-3.5 py-1 rounded-full border border-purple-200">
+              Technology Stack
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-purple-950 tracking-tight mt-3 mb-4">
+              Built With Modern Full-Stack Technologies
+            </h2>
+            <p className="text-sm text-purple-900/70 font-medium">
+              Enterprise-grade MERN architecture with high availability and zero-config in-memory fallback.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            
+            <div className="bg-white p-5 rounded-3xl border border-purple-100 text-center shadow-sm hover:border-purple-300 transition">
+              <div className="w-10 h-10 rounded-2xl bg-cyan-100 text-cyan-700 font-extrabold text-lg flex items-center justify-center mx-auto mb-3">
+                ⚛️
+              </div>
+              <p className="font-extrabold text-xs text-purple-950">React 19</p>
+              <p className="text-[10px] text-purple-900/50 font-semibold mt-0.5">Frontend Client</p>
+            </div>
+
+            <div className="bg-white p-5 rounded-3xl border border-purple-100 text-center shadow-sm hover:border-purple-300 transition">
+              <div className="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 font-extrabold text-lg flex items-center justify-center mx-auto mb-3">
+                ⚡
+              </div>
+              <p className="font-extrabold text-xs text-purple-950">Vite</p>
+              <p className="text-[10px] text-purple-900/50 font-semibold mt-0.5">Lightning Build Engine</p>
+            </div>
+
+            <div className="bg-white p-5 rounded-3xl border border-purple-100 text-center shadow-sm hover:border-purple-300 transition">
+              <div className="w-10 h-10 rounded-2xl bg-sky-100 text-sky-700 font-extrabold text-lg flex items-center justify-center mx-auto mb-3">
+                🎨
+              </div>
+              <p className="font-extrabold text-xs text-purple-950">Tailwind CSS</p>
+              <p className="text-[10px] text-purple-900/50 font-semibold mt-0.5">Glassmorphic Styling</p>
+            </div>
+
+            <div className="bg-white p-5 rounded-3xl border border-purple-100 text-center shadow-sm hover:border-purple-300 transition">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 font-extrabold text-lg flex items-center justify-center mx-auto mb-3">
+                🟢
+              </div>
+              <p className="font-extrabold text-xs text-purple-950">Node & Express</p>
+              <p className="text-[10px] text-purple-900/50 font-semibold mt-0.5">REST API Server</p>
+            </div>
+
+            <div className="bg-white p-5 rounded-3xl border border-purple-100 text-center shadow-sm hover:border-purple-300 transition">
+              <div className="w-10 h-10 rounded-2xl bg-green-100 text-green-700 font-extrabold text-lg flex items-center justify-center mx-auto mb-3">
+                🍃
+              </div>
+              <p className="font-extrabold text-xs text-purple-950">MongoDB Mongoose</p>
+              <p className="text-[10px] text-purple-900/50 font-semibold mt-0.5">Database Schemas</p>
+            </div>
+
+            <div className="bg-white p-5 rounded-3xl border border-purple-100 text-center shadow-sm hover:border-purple-300 transition">
+              <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 font-extrabold text-lg flex items-center justify-center mx-auto mb-3">
+                ⚡
+              </div>
+              <p className="font-extrabold text-xs text-purple-950">InMemory Fallback</p>
+              <p className="text-[10px] text-purple-900/50 font-semibold mt-0.5">Zero-Config DB</p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* Call to Action Banner */}
       <section className="py-16 px-4 max-w-[1300px] mx-auto">
         <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 text-white rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden shadow-2xl">
