@@ -151,9 +151,9 @@ function EmployeeDashboard() {
               <span className="absolute right-3 top-2.5 text-[10px] font-bold bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">⌘K</span>
             </div>
 
-            {/* Nav Group: MAIN */}
+            {/* Nav Group: WORKSPACE */}
             <div className="mb-6">
-              <p className="text-[10px] font-extrabold uppercase tracking-wider text-purple-900/40 mb-3 px-3">Main</p>
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-purple-900/40 mb-3 px-3">Workspace</p>
               <nav className="space-y-1">
                 <button
                   onClick={() => setActiveNav('dashboard')}
@@ -162,47 +162,28 @@ function EmployeeDashboard() {
                   <span>🏠</span> Dashboard
                 </button>
                 <button
-                  onClick={() => setActiveNav('exams')}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${activeNav === 'exams' ? 'bg-purple-100/80 text-purple-900 border border-purple-200/60 shadow-sm' : 'text-purple-900/70 hover:bg-purple-50'}`}
+                  onClick={() => setActiveNav('attendance')}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${activeNav === 'attendance' ? 'bg-purple-100/80 text-purple-900 border border-purple-200/60 shadow-sm' : 'text-purple-900/70 hover:bg-purple-50'}`}
                 >
-                  <span>🏷️</span> Exams & Tasks
+                  <span>📅</span> Attendance Check-In
                 </button>
                 <button
-                  onClick={() => setActiveNav('lms')}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${activeNav === 'lms' ? 'bg-purple-100/80 text-purple-900 border border-purple-200/60 shadow-sm' : 'text-purple-900/70 hover:bg-purple-50'}`}
+                  onClick={() => setActiveNav('work')}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${activeNav === 'work' ? 'bg-purple-100/80 text-purple-900 border border-purple-200/60 shadow-sm' : 'text-purple-900/70 hover:bg-purple-50'}`}
                 >
-                  <span>🗂️</span> LMS Reports
+                  <span>🖼️</span> Work Submissions
                 </button>
                 <button
-                  onClick={() => setActiveNav('questions')}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${activeNav === 'questions' ? 'bg-purple-100/80 text-purple-900 border border-purple-200/60 shadow-sm' : 'text-purple-900/70 hover:bg-purple-50'}`}
+                  onClick={() => setActiveNav('score')}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${activeNav === 'score' ? 'bg-purple-100/80 text-purple-900 border border-purple-200/60 shadow-sm' : 'text-purple-900/70 hover:bg-purple-50'}`}
                 >
-                  <span>❓</span> Questions
+                  <span>📊</span> Performance Ratings
                 </button>
                 <button
-                  onClick={() => setActiveNav('students')}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${activeNav === 'students' ? 'bg-purple-100/80 text-purple-900 border border-purple-200/60 shadow-sm' : 'text-purple-900/70 hover:bg-purple-50'}`}
+                  onClick={() => setActiveNav('notifications')}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${activeNav === 'notifications' ? 'bg-purple-100/80 text-purple-900 border border-purple-200/60 shadow-sm' : 'text-purple-900/70 hover:bg-purple-50'}`}
                 >
-                  <span>👥</span> Students Team
-                </button>
-              </nav>
-            </div>
-
-            {/* Nav Group: MANAGEMENT */}
-            <div className="mb-6 border-t border-purple-100 pt-5">
-              <p className="text-[10px] font-extrabold uppercase tracking-wider text-purple-900/40 mb-3 px-3">Management</p>
-              <nav className="space-y-1">
-                <button className="w-full flex items-center gap-3 px-3.5 py-2 rounded-2xl text-xs font-bold text-purple-900/70 hover:bg-purple-50 transition">
-                  <span>🎛️</span> Results Database
-                </button>
-                <button className="w-full flex items-center gap-3 px-3.5 py-2 rounded-2xl text-xs font-bold text-purple-900/70 hover:bg-purple-50 transition">
-                  <span>📊</span> Statistics
-                </button>
-                <button className="w-full flex items-center gap-3 px-3.5 py-2 rounded-2xl text-xs font-bold text-purple-900/70 hover:bg-purple-50 transition">
-                  <span>🎓</span> Certificates
-                </button>
-                <button className="w-full flex items-center gap-3 px-3.5 py-2 rounded-2xl text-xs font-bold text-purple-900/70 hover:bg-purple-50 transition">
-                  <span>📋</span> Surveys
+                  <span>🔔</span> Notifications ({notifications.length})
                 </button>
               </nav>
             </div>
@@ -215,7 +196,7 @@ function EmployeeDashboard() {
                   <span>⚙️</span> Settings
                 </button>
                 <button className="w-full flex items-center gap-3 px-3.5 py-2 rounded-2xl text-xs font-bold text-purple-900/70 hover:bg-purple-50 transition">
-                  <span>❓</span> Help Center
+                  <span>❓</span> Help & Documentation
                 </button>
               </nav>
             </div>
@@ -333,15 +314,15 @@ function EmployeeDashboard() {
             </div>
           )}
 
-          {/* ================= TOP 3 METRIC CARDS ROW (Exact Tabor Study Design) ================= */}
+          {/* ================= TOP 3 METRIC CARDS ROW ================= */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             
-            {/* Card 1: Need to grade / Performance Score with Donut SVG */}
+            {/* Card 1: Performance Score with Donut SVG */}
             <div className="bg-white rounded-3xl p-5 border border-purple-100 shadow-sm flex flex-col justify-between">
               <div className="flex justify-between items-start mb-3">
                 <div>
-                  <p className="text-[11px] font-bold text-purple-900/60">Need to grade</p>
-                  <p className="text-2xl font-extrabold text-purple-950 mt-1">{profile.performance_score}% <span className="text-xs text-purple-950 font-bold">Grade</span></p>
+                  <p className="text-[11px] font-bold text-purple-900/60">Performance Score</p>
+                  <p className="text-2xl font-extrabold text-purple-950 mt-1">{profile.performance_score}% <span className="text-xs text-purple-950 font-bold">Rating</span></p>
                   <span className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-600 mt-1">
                     ↗ +4.56%
                   </span>
@@ -373,17 +354,17 @@ function EmployeeDashboard() {
 
               <div className="flex items-center gap-2 pt-3 border-t border-purple-100 text-[11px] font-semibold text-purple-900/50">
                 <span className="w-5 h-5 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-[10px] font-bold">📑</span>
-                <span>yearly student exam test online system</span>
+                <span>System Score Deductions & Rating Logs</span>
               </div>
             </div>
 
-            {/* Card 2: New Active Student / Attendance Status */}
+            {/* Card 2: Attendance Activity Status */}
             <div className="bg-white rounded-3xl p-5 border border-purple-100 shadow-sm flex flex-col justify-between">
               <div>
                 <div className="flex justify-between items-start mb-2">
                   <div>
-                    <p className="text-[11px] font-bold text-purple-900/60">New Active student</p>
-                    <p className="text-2xl font-extrabold text-purple-950 mt-1">536</p>
+                    <p className="text-[11px] font-bold text-purple-900/60">Attendance Logs</p>
+                    <p className="text-2xl font-extrabold text-purple-950 mt-1">{attendanceHistory.length} <span className="text-xs font-bold text-purple-950">Days</span></p>
                     <span className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-600 mt-1">
                       ↗ +6.354%
                     </span>
@@ -418,13 +399,13 @@ function EmployeeDashboard() {
               </div>
             </div>
 
-            {/* Card 3: Questions / Work Submissions Count */}
+            {/* Card 3: Work Submissions Verification Count */}
             <div className="bg-white rounded-3xl p-5 border border-purple-100 shadow-sm flex flex-col justify-between">
               <div>
                 <div className="flex justify-between items-start mb-2">
                   <div>
-                    <p className="text-[11px] font-bold text-purple-900/60">Questions & Tasks</p>
-                    <p className="text-2xl font-extrabold text-purple-950 mt-1">64</p>
+                    <p className="text-[11px] font-bold text-purple-900/60">Work Proof Reports</p>
+                    <p className="text-2xl font-extrabold text-purple-950 mt-1">{workHistory.length} <span className="text-xs font-bold text-purple-950">Submissions</span></p>
                     <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 mt-1">
                       ↗ +2.56%
                     </span>
@@ -442,8 +423,8 @@ function EmployeeDashboard() {
               </div>
 
               <div className="flex items-center gap-2 pt-3 border-t border-purple-100 text-[11px] font-semibold text-purple-900/50">
-                <span className="w-5 h-5 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-bold">❓</span>
-                <span>yearly student exam test online system monthly time remaining</span>
+                <span className="w-5 h-5 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-bold">🖼️</span>
+                <span>GitHub Repository & Screenshot Verification</span>
               </div>
             </div>
 
@@ -452,17 +433,17 @@ function EmployeeDashboard() {
           {/* ================= MIDDLE ROW: 2 LARGE ANALYTICS CARDS ================= */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
             
-            {/* Left 7 Columns: Exam Taken Times (Line Chart with Gradient Fill) */}
+            {/* Left 7 Columns: Work Performance Trend (Line Chart with Gradient Fill) */}
             <div className="lg:col-span-7 bg-white rounded-3xl p-5 sm:p-6 border border-purple-100 shadow-sm flex flex-col justify-between">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-sm font-extrabold text-purple-950">Exam Taken Times</h3>
-                  <p className="text-[11px] font-semibold text-purple-900/50 mt-0.5">Taken records of last Years</p>
+                  <h3 className="text-sm font-extrabold text-purple-950">Work Performance Trend</h3>
+                  <p className="text-[11px] font-semibold text-purple-900/50 mt-0.5">Monthly Activity Logs</p>
                 </div>
 
                 <div className="flex items-center gap-4 text-xs font-bold">
-                  <span className="flex items-center gap-1.5 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-purple-600"></span> Active Exams</span>
-                  <span className="flex items-center gap-1.5 text-purple-900/50"><span className="w-2.5 h-2.5 rounded-full bg-purple-200"></span> Active Exam Takers</span>
+                  <span className="flex items-center gap-1.5 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-purple-600"></span> Logged Work Hours</span>
+                  <span className="flex items-center gap-1.5 text-purple-900/50"><span className="w-2.5 h-2.5 rounded-full bg-purple-200"></span> Target Benchmarks</span>
                   <button className="bg-purple-50 border border-purple-100 px-3 py-1 rounded-xl text-[11px] font-bold text-purple-900">
                     📅 Monthly ▾
                   </button>
@@ -522,85 +503,85 @@ function EmployeeDashboard() {
               </div>
             </div>
 
-            {/* Right 5 Columns: Average Results For Test Questions (Segmented Skill Progress Bars) */}
+            {/* Right 5 Columns: Department Skill Tasks (Segmented Progress Bars) */}
             <div className="lg:col-span-5 bg-white rounded-3xl p-5 sm:p-6 border border-purple-100 shadow-sm flex flex-col justify-between">
               <div>
-                <h3 className="text-sm font-extrabold text-purple-950 mb-3">Average Results For Test Questions</h3>
+                <h3 className="text-sm font-extrabold text-purple-950 mb-3">Department Skill Tasks</h3>
 
                 {/* Indicator Badges */}
                 <div className="flex flex-wrap gap-3 text-[10px] font-bold mb-5">
-                  <span className="flex items-center gap-1 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-purple-600"></span> Easy questions</span>
-                  <span className="flex items-center gap-1 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Medium questions</span>
-                  <span className="flex items-center gap-1 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Difficult</span>
-                  <span className="flex items-center gap-1 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-orange-600"></span> Hard</span>
+                  <span className="flex items-center gap-1 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-purple-600"></span> Frontend Dev</span>
+                  <span className="flex items-center gap-1 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Backend APIs</span>
+                  <span className="flex items-center gap-1 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Database</span>
+                  <span className="flex items-center gap-1 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-orange-600"></span> DevOps</span>
                 </div>
 
                 {/* Horizontal Segmented Progress Bars */}
                 <div className="space-y-4">
-                  {/* Subject 1 */}
+                  {/* Skill 1 */}
                   <div>
-                    <p className="text-xs font-bold text-purple-950 mb-1.5">Mathematic</p>
+                    <p className="text-xs font-bold text-purple-950 mb-1.5">Frontend Development</p>
                     <div className="flex h-3 rounded-full overflow-hidden bg-purple-50">
-                      <div className="bg-purple-600 w-[40%]"></div>
-                      <div className="bg-emerald-400 w-[30%] border-l-2 border-white"></div>
-                      <div className="bg-amber-400 w-[10%] border-l-2 border-white"></div>
-                      <div className="bg-orange-500 w-[20%] border-l-2 border-white"></div>
+                      <div className="bg-purple-600 w-[50%]"></div>
+                      <div className="bg-emerald-400 w-[25%] border-l-2 border-white"></div>
+                      <div className="bg-amber-400 w-[15%] border-l-2 border-white"></div>
+                      <div className="bg-orange-500 w-[10%] border-l-2 border-white"></div>
                     </div>
                   </div>
 
-                  {/* Subject 2 */}
+                  {/* Skill 2 */}
                   <div>
-                    <p className="text-xs font-bold text-purple-950 mb-1.5">English 1</p>
+                    <p className="text-xs font-bold text-purple-950 mb-1.5">Backend REST APIs</p>
                     <div className="flex h-3 rounded-full overflow-hidden bg-purple-50">
-                      <div className="bg-purple-600 w-[55%]"></div>
-                      <div className="bg-emerald-400 w-[10%] border-l-2 border-white"></div>
+                      <div className="bg-purple-600 w-[20%]"></div>
+                      <div className="bg-emerald-400 w-[50%] border-l-2 border-white"></div>
                       <div className="bg-amber-400 w-[20%] border-l-2 border-white"></div>
-                      <div className="bg-orange-500 w-[15%] border-l-2 border-white"></div>
+                      <div className="bg-orange-500 w-[10%] border-l-2 border-white"></div>
                     </div>
                   </div>
 
-                  {/* Subject 3 */}
+                  {/* Skill 3 */}
                   <div>
-                    <p className="text-xs font-bold text-purple-950 mb-1.5">Science 2</p>
+                    <p className="text-xs font-bold text-purple-950 mb-1.5">Database & ORM</p>
                     <div className="flex h-3 rounded-full overflow-hidden bg-purple-50">
                       <div className="bg-purple-600 w-[15%]"></div>
-                      <div className="bg-emerald-400 w-[45%] border-l-2 border-white"></div>
-                      <div className="bg-amber-400 w-[25%] border-l-2 border-white"></div>
+                      <div className="bg-emerald-400 w-[30%] border-l-2 border-white"></div>
+                      <div className="bg-amber-400 w-[40%] border-l-2 border-white"></div>
                       <div className="bg-orange-500 w-[15%] border-l-2 border-white"></div>
                     </div>
                   </div>
 
-                  {/* Subject 4 */}
+                  {/* Skill 4 */}
                   <div>
-                    <p className="text-xs font-bold text-purple-950 mb-1.5">Economics</p>
+                    <p className="text-xs font-bold text-purple-950 mb-1.5">DevOps & Deployment</p>
                     <div className="flex h-3 rounded-full overflow-hidden bg-purple-50">
-                      <div className="bg-purple-600 w-[35%]"></div>
-                      <div className="bg-emerald-400 w-[25%] border-l-2 border-white"></div>
-                      <div className="bg-amber-400 w-[30%] border-l-2 border-white"></div>
-                      <div className="bg-orange-500 w-[10%] border-l-2 border-white"></div>
+                      <div className="bg-purple-600 w-[30%]"></div>
+                      <div className="bg-emerald-400 w-[20%] border-l-2 border-white"></div>
+                      <div className="bg-amber-400 w-[20%] border-l-2 border-white"></div>
+                      <div className="bg-orange-500 w-[30%] border-l-2 border-white"></div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Pass Mark Scale at Bottom */}
+              {/* Benchmark Scale at Bottom */}
               <div className="flex justify-between text-[10px] font-bold text-purple-900/40 border-t border-purple-100 pt-3 mt-4">
-                <span>Pass Mark:</span>
-                <span>10</span><span>20</span><span>30</span><span>40</span><span>50</span><span>60</span><span>70</span><span>80</span><span>90</span><span>100</span>
+                <span>Task Target:</span>
+                <span>10%</span><span>20%</span><span>30%</span><span>40%</span><span>50%</span><span>60%</span><span>70%</span><span>80%</span><span>90%</span><span>100%</span>
               </div>
             </div>
 
           </div>
 
-          {/* ================= BOTTOM DATA TABLE: BROWSE TEST RESULTS ================= */}
+          {/* ================= BOTTOM DATA TABLE ================= */}
           <div className="bg-white rounded-3xl p-5 sm:p-6 border border-purple-100 shadow-sm">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-sm font-extrabold text-purple-950">Browse test results</h3>
+              <h3 className="text-sm font-extrabold text-purple-950">Recent Work Submissions & Verification Logs</h3>
               <button
                 onClick={() => setShowSubmitModal(true)}
                 className="bg-purple-50 hover:bg-purple-100 border border-purple-100 text-purple-900 px-3.5 py-2 rounded-2xl text-xs font-bold flex items-center gap-2 transition"
               >
-                ✉️ Send certificates / Submit Work
+                🖼️ Submit New Work Report
               </button>
             </div>
 
