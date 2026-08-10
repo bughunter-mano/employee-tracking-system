@@ -130,6 +130,15 @@ function Login() {
               </button>
             </div>
           </div>
+
+          <div className="mt-5 pt-4 border-t border-purple-100 text-center">
+            <p className="text-xs text-purple-900/60 font-medium">
+              Don't have an employee account?{' '}
+              <Link to="/register" className="text-purple-700 font-extrabold hover:underline">
+                Create New Employee Account
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

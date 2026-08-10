@@ -41,16 +41,23 @@ function AdminDashboard() {
 
   const handleAddEmployee = async (e) => {
     e.preventDefault();
+    setMessage('');
     try {
-      await api.post('/admin/employees', { name, email, password, role: 'employee' });
-      setMessage('Employee added successfully!');
+      const res = await api.post('/admin/employees', { name, email, password, role: 'employee' });
+      setMessage('✅ Employee registered successfully!');
       setName('');
       setEmail('');
       setPassword('');
-      setShowAddForm(false);
+      if (res.data?.employee) {
+        setEmployees((prev) => [res.data.employee, ...prev]);
+      }
       fetchEmployees();
+      setTimeout(() => {
+        setShowAddForm(false);
+        setMessage('');
+      }, 1200);
     } catch (err) {
-      setMessage(err.response?.data?.message || 'Failed to add employee');
+      setMessage(`❌ ${err.response?.data?.message || 'Failed to add employee'}`);
     }
   };
 

@@ -24,10 +24,12 @@ const createEmployeeByAdmin = async (name, email, password, role) => {
     name,
     email,
     password_hash: hashedPassword,
-    role: role || 'employee'
+    role: role || 'employee',
+    performance_score: 100,
+    status: 'active'
   });
   await user.save();
-  return { id: user.id, name: user.name, email: user.email, role: user.role };
+  return { id: user.id, _id: user._id, name: user.name, email: user.email, role: user.role, performance_score: user.performance_score, status: user.status };
 };
 
 // Employee ki details edit karna (naam/email)
