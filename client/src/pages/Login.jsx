@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axiosConfig';
+import logoImg from '../assets/logo.jpg';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -46,11 +47,9 @@ function Login() {
       {/* Centered Content Container */}
       <div className="relative z-10 w-full max-w-md my-auto">
         <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-gradient-to-tr from-purple-700 via-indigo-600 to-purple-500 rounded-3xl flex items-center justify-center font-bold text-3xl text-white mx-auto mb-3 shadow-lg shadow-purple-500/25">
-            ⚡
-          </div>
-          <h1 className="text-3xl font-extrabold text-purple-950 tracking-tight">EmpTrack <span className="text-purple-600">Labs</span></h1>
-          <p className="text-purple-800/70 text-sm mt-1 font-medium">Performance & Workspace Portal</p>
+          <img src={logoImg} alt="AuraPulse OS" className="w-16 h-16 rounded-3xl shadow-xl mx-auto mb-3 object-cover border-2 border-purple-200" />
+          <h1 className="text-3xl font-extrabold text-purple-950 tracking-tight">AuraPulse <span className="text-purple-600 font-semibold">OS</span></h1>
+          <p className="text-purple-800/70 text-sm mt-1 font-medium">Intelligent Workforce & Performance Portal</p>
         </div>
 
         <div className="bg-white/90 border border-purple-100/90 backdrop-blur-2xl p-8 rounded-3xl shadow-xl shadow-purple-950/5 relative overflow-hidden">

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/hero_bg.jpg';
+import logoImg from '../assets/logo.jpg';
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -127,15 +128,13 @@ function LandingPage() {
     <div className="min-h-screen lavender-bg text-purple-950 selection:bg-purple-200 selection:text-purple-900 font-sans">
       
       {/* Top Floating Navbar */}
-      <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-xl border-b border-purple-100/90 px-6 py-4 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-xl border-b border-purple-100/90 px-6 py-3.5 shadow-sm">
         <div className="max-w-[1300px] mx-auto flex items-center justify-between">
           
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-            <div className="w-10 h-10 bg-gradient-to-tr from-purple-700 via-indigo-600 to-purple-500 rounded-2xl flex items-center justify-center font-bold text-xl text-white shadow-md shadow-purple-500/25">
-              ⚡
-            </div>
+            <img src={logoImg} alt="AuraPulse OS" className="w-10 h-10 rounded-2xl shadow-md object-cover border border-purple-200" />
             <span className="font-extrabold text-2xl tracking-tight text-purple-950">
-              EmpTrack <span className="text-purple-600 font-semibold text-lg">Labs</span>
+              AuraPulse <span className="text-purple-600 font-semibold text-lg">OS</span>
             </span>
           </div>
 
@@ -429,7 +428,7 @@ function LandingPage() {
               onClick={() => navigate('/login')}
               className="bg-white hover:bg-purple-50 text-purple-950 font-extrabold text-sm px-8 py-4 rounded-2xl shadow-lg transition active:scale-95"
             >
-              Sign In to EmpTrack Portal ⚡
+              Launch AuraPulse OS Portal 🚀
             </button>
           </div>
         </div>
@@ -438,11 +437,11 @@ function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-purple-100 bg-white/70 backdrop-blur-md py-8 px-6 text-center text-xs font-semibold text-purple-900/60">
         <div className="max-w-[1300px] mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-purple-700 text-white rounded-lg flex items-center justify-center font-bold text-xs">⚡</div>
-            <span className="font-extrabold text-purple-950 text-sm">EmpTrack Labs</span>
+          <div className="flex items-center gap-3">
+            <img src={logoImg} alt="AuraPulse OS" className="w-7 h-7 rounded-xl object-cover border border-purple-200" />
+            <span className="font-extrabold text-purple-950 text-sm">AuraPulse OS</span>
           </div>
-          <p>© 2026 EmpTrack Pro System • Craftive Lavender System. All rights reserved.</p>
+          <p>© 2026 AuraPulse OS • Intelligent Workforce & Performance OS. All rights reserved.</p>
         </div>
       </footer>
 

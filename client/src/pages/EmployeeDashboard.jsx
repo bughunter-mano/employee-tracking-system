@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axiosConfig';
-import Navbar from '../components/Navbar';
+import logoImg from '../assets/logo.jpg';
 
 function EmployeeDashboard() {
   const [profile, setProfile] = useState(null);
@@ -12,8 +12,10 @@ function EmployeeDashboard() {
   const [notifications, setNotifications] = useState([]);
   const [workHistory, setWorkHistory] = useState([]);
   const [attendanceHistory, setAttendanceHistory] = useState([]);
-  const [activeTab, setActiveTab] = useState('work');
+  const [activeNav, setActiveNav] = useState('dashboard');
   const [submitting, setSubmitting] = useState(false);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showBanner, setShowBanner] = useState(true);
 
   useEffect(() => {
     fetchProfile();
@@ -98,6 +100,7 @@ function EmployeeDashboard() {
       setMessage('Work submitted successfully!');
       setGithubLink('');
       setScreenshotFile(null);
+      setShowSubmitModal(false);
       fetchWorkHistory();
     } catch (err) {
       setMessage(err.response?.data?.message || 'Submission failed');
@@ -111,420 +114,641 @@ function EmployeeDashboard() {
       <div className="min-h-screen flex items-center justify-center lavender-bg">
         <div className="flex items-center gap-3 bg-white px-6 py-4 rounded-3xl shadow-sm border border-purple-100">
           <div className="w-6 h-6 border-3 border-purple-700 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-purple-950 font-semibold text-sm">Loading Employee Portal...</p>
+          <p className="text-purple-950 font-bold text-sm">Loading AuraPulse Workspace...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen lavender-bg pb-12">
-      <Navbar userName={profile.name} role="employee" />
-
-      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 pt-8">
+    <div className="min-h-screen lavender-bg p-3 sm:p-6 text-purple-950 font-sans selection:bg-purple-200">
+      
+      {/* Outer Shell Wrapper (Matching Reference Image Frame) */}
+      <div className="max-w-[1600px] mx-auto bg-white/80 backdrop-blur-2xl rounded-[36px] border border-purple-100/90 shadow-2xl p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 relative">
         
-        {/* Header Greeting & Quick Stat Badges Row (Matches Image Top Header) */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+        {/* ================= LEFT SIDEBAR (AuraPulse OS Navigation) ================= */}
+        <aside className="lg:col-span-3 xl:col-span-2 bg-white rounded-3xl p-5 border border-purple-100 shadow-sm flex flex-col justify-between min-h-[750px]">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-purple-950 tracking-tight">
-              Welcome Back, <span className="text-purple-700">{profile.name}</span> 👋
-            </h1>
-            <div className="flex items-center gap-4 mt-2">
-              <span className="text-xs font-semibold bg-purple-100 text-purple-800 px-3 py-1 rounded-full border border-purple-200">
-                Score: {profile.performance_score}%
-              </span>
-              <span className="text-xs font-semibold bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full border border-indigo-200 capitalize">
-                Status: {profile.status}
-              </span>
-              <span className="text-xs font-medium text-purple-900/60 hidden sm:inline-block">
-                Employee Workspace • Craftive Design System
-              </span>
+            {/* Top Brand Logo & Collapse Icon */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <img src={logoImg} alt="AuraPulse OS" className="w-10 h-10 rounded-2xl shadow-md object-cover border border-purple-200" />
+                <span className="font-extrabold text-base text-purple-950 tracking-tight">AuraPulse OS</span>
+              </div>
+              <button className="w-8 h-8 rounded-xl bg-purple-50 text-purple-700 font-bold hover:bg-purple-100 flex items-center justify-center text-xs border border-purple-100">
+                ➔
+              </button>
+            </div>
+
+            {/* Sidebar Search Bar */}
+            <div className="relative mb-6">
+              <input
+                type="text"
+                placeholder="Search"
+                className="w-full bg-purple-50/50 border border-purple-100 rounded-2xl py-2.5 pl-9 pr-8 text-xs font-semibold text-purple-950 focus:outline-none focus:ring-2 focus:ring-purple-600 placeholder:text-purple-900/40"
+              />
+              <span className="absolute left-3 top-2.5 text-xs text-purple-900/50">🔍</span>
+              <span className="absolute right-3 top-2.5 text-[10px] font-bold bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">⌘K</span>
+            </div>
+
+            {/* Nav Group: MAIN */}
+            <div className="mb-6">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-purple-900/40 mb-3 px-3">Main</p>
+              <nav className="space-y-1">
+                <button
+                  onClick={() => setActiveNav('dashboard')}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${activeNav === 'dashboard' ? 'bg-purple-100/80 text-purple-900 border border-purple-200/60 shadow-sm' : 'text-purple-900/70 hover:bg-purple-50'}`}
+                >
+                  <span>🏠</span> Dashboard
+                </button>
+                <button
+                  onClick={() => setActiveNav('exams')}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${activeNav === 'exams' ? 'bg-purple-100/80 text-purple-900 border border-purple-200/60 shadow-sm' : 'text-purple-900/70 hover:bg-purple-50'}`}
+                >
+                  <span>🏷️</span> Exams & Tasks
+                </button>
+                <button
+                  onClick={() => setActiveNav('lms')}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${activeNav === 'lms' ? 'bg-purple-100/80 text-purple-900 border border-purple-200/60 shadow-sm' : 'text-purple-900/70 hover:bg-purple-50'}`}
+                >
+                  <span>🗂️</span> LMS Reports
+                </button>
+                <button
+                  onClick={() => setActiveNav('questions')}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${activeNav === 'questions' ? 'bg-purple-100/80 text-purple-900 border border-purple-200/60 shadow-sm' : 'text-purple-900/70 hover:bg-purple-50'}`}
+                >
+                  <span>❓</span> Questions
+                </button>
+                <button
+                  onClick={() => setActiveNav('students')}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${activeNav === 'students' ? 'bg-purple-100/80 text-purple-900 border border-purple-200/60 shadow-sm' : 'text-purple-900/70 hover:bg-purple-50'}`}
+                >
+                  <span>👥</span> Students Team
+                </button>
+              </nav>
+            </div>
+
+            {/* Nav Group: MANAGEMENT */}
+            <div className="mb-6 border-t border-purple-100 pt-5">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-purple-900/40 mb-3 px-3">Management</p>
+              <nav className="space-y-1">
+                <button className="w-full flex items-center gap-3 px-3.5 py-2 rounded-2xl text-xs font-bold text-purple-900/70 hover:bg-purple-50 transition">
+                  <span>🎛️</span> Results Database
+                </button>
+                <button className="w-full flex items-center gap-3 px-3.5 py-2 rounded-2xl text-xs font-bold text-purple-900/70 hover:bg-purple-50 transition">
+                  <span>📊</span> Statistics
+                </button>
+                <button className="w-full flex items-center gap-3 px-3.5 py-2 rounded-2xl text-xs font-bold text-purple-900/70 hover:bg-purple-50 transition">
+                  <span>🎓</span> Certificates
+                </button>
+                <button className="w-full flex items-center gap-3 px-3.5 py-2 rounded-2xl text-xs font-bold text-purple-900/70 hover:bg-purple-50 transition">
+                  <span>📋</span> Surveys
+                </button>
+              </nav>
+            </div>
+
+            {/* Nav Group: SYSTEM */}
+            <div className="border-t border-purple-100 pt-5">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-purple-900/40 mb-3 px-3">System</p>
+              <nav className="space-y-1">
+                <button className="w-full flex items-center gap-3 px-3.5 py-2 rounded-2xl text-xs font-bold text-purple-900/70 hover:bg-purple-50 transition">
+                  <span>⚙️</span> Settings
+                </button>
+                <button className="w-full flex items-center gap-3 px-3.5 py-2 rounded-2xl text-xs font-bold text-purple-900/70 hover:bg-purple-50 transition">
+                  <span>❓</span> Help Center
+                </button>
+              </nav>
             </div>
           </div>
 
-          {/* Right Metrics Cards (Matching Top Right 3 Cards in Screenshot) */}
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 shrink-0">
-            <div className="bg-white p-4 rounded-3xl border border-purple-100 shadow-sm flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-purple-700 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-purple-700/20">
-                ⚡
+          {/* Bottom Sidebar User Profile Box */}
+          <div className="pt-4 border-t border-purple-100 mt-6">
+            <div className="flex items-center gap-3 bg-purple-50/70 p-2.5 rounded-2xl border border-purple-100">
+              <div className="w-9 h-9 rounded-xl bg-purple-700 text-white font-extrabold flex items-center justify-center text-sm shadow-sm">
+                {profile.name ? profile.name.charAt(0).toUpperCase() : 'U'}
               </div>
-              <div>
-                <p className="text-[11px] font-semibold text-purple-900/60 uppercase">Score</p>
-                <p className="text-xl font-extrabold text-purple-950">{profile.performance_score}%</p>
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-3xl border border-purple-100 shadow-sm flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-indigo-600/20">
-                📊
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold text-purple-900/60 uppercase">Task</p>
-                <p className="text-xl font-extrabold text-purple-950">{workHistory.length}</p>
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-3xl border border-purple-100 shadow-sm flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-purple-900 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-purple-900/20">
-                📅
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold text-purple-900/60 uppercase">Attended</p>
-                <p className="text-xl font-extrabold text-purple-950">{attendanceHistory.length}</p>
+              <div className="overflow-hidden">
+                <p className="font-extrabold text-xs text-purple-950 truncate">{profile.name}</p>
+                <p className="text-[10px] font-medium text-purple-900/50 truncate">{profile.email}</p>
               </div>
             </div>
           </div>
-        </div>
+        </aside>
 
-        {/* Warning Banner if score <= 60 */}
-        {profile.performance_score <= 60 && (
-          <div className="bg-red-500/10 border border-red-500/30 text-red-700 p-4 rounded-3xl mb-8 flex items-center gap-3">
-            <span className="text-2xl">⚠️</span>
-            <div>
-              <p className="font-bold">Performance Alert: Score is low ({profile.performance_score}%)</p>
-              <p className="text-xs text-red-600">Please mark attendance and submit daily proof of work to maintain active status.</p>
-            </div>
-          </div>
-        )}
-
-        {/* Main Grid Section (Matching Reference Image Grid Layout) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+        {/* ================= MAIN DASHBOARD WORKSPACE ================= */}
+        <main className="lg:col-span-9 xl:col-span-10 space-y-6">
           
-          {/* Left Column (8 cols): Profile Card, Time Tracker & Work Submission */}
-          <div className="lg:col-span-8 space-y-6">
-            
-            {/* Top Cards Row: Profile Card + Progress + Time Tracker */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* Top Header Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl p-5 border border-purple-100 shadow-sm">
+            <div>
+              <h1 className="text-2xl font-extrabold text-purple-950 tracking-tight">
+                Good Mornings, <span className="text-purple-700">{profile.name}</span>
+              </h1>
+              <p className="text-xs font-bold text-purple-900/50 mt-0.5">Exam Date: 02 Aug, 2026</p>
+            </div>
+
+            {/* Right Header Action Badges & Buttons */}
+            <div className="flex items-center gap-3">
+              <button className="w-10 h-10 rounded-2xl bg-purple-50 border border-purple-100 text-purple-800 flex items-center justify-center font-bold text-sm hover:bg-purple-100 transition">
+                ✉️
+              </button>
               
-              {/* Profile Highlight Card (Matches Left Card in Screenshot) */}
-              <div className="bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-950 text-white p-6 rounded-3xl shadow-lg relative overflow-hidden flex flex-col justify-between">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold bg-white/20 px-3 py-1 rounded-full backdrop-blur-md">
-                    EmpTrack Pro
+              {/* Notification Icon with Badge */}
+              <div className="relative">
+                <button className="w-10 h-10 rounded-2xl bg-purple-50 border border-purple-100 text-purple-800 flex items-center justify-center font-bold text-sm hover:bg-purple-100 transition">
+                  🔔
+                </button>
+                {notifications.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
+                    {notifications.length}
                   </span>
-                  <span className="text-xs text-purple-200">Active</span>
-                </div>
-                <div className="mt-6">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-400 to-pink-400 flex items-center justify-center text-white font-extrabold text-2xl mb-3 shadow-md">
-                    {profile.name.charAt(0)}
-                  </div>
-                  <h3 className="font-bold text-lg leading-tight">{profile.name}</h3>
-                  <p className="text-xs text-purple-300 mt-0.5">{profile.email}</p>
-                </div>
-                <div className="mt-4 pt-3 border-t border-white/10 flex justify-between items-center text-xs">
-                  <span className="text-purple-200 font-medium">Performance Tier</span>
-                  <span className="font-bold bg-purple-500/40 text-purple-100 px-2.5 py-0.5 rounded-full border border-purple-400/30">
-                    {profile.performance_score >= 80 ? '⭐ Top Tier' : 'Standard'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Progress Bar Chart Component (Matches Screenshot Center Bar Chart) */}
-              <div className="bg-white p-6 rounded-3xl border border-purple-100 shadow-sm flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-semibold text-purple-900/60 uppercase">Progress</span>
-                    <span className="w-7 h-7 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold">↗</span>
-                  </div>
-                  <p className="text-2xl font-extrabold text-purple-950">5.1 h <span className="text-xs font-medium text-purple-900/50">/ week</span></p>
-                </div>
-                <div className="flex items-end justify-between gap-1.5 h-20 mt-4 px-2">
-                  <div className="w-full bg-purple-100 rounded-lg h-10"></div>
-                  <div className="w-full bg-purple-100 rounded-lg h-14"></div>
-                  <div className="w-full bg-purple-100 rounded-lg h-8"></div>
-                  <div className="w-full bg-purple-100 rounded-lg h-12"></div>
-                  <div className="w-full bg-purple-700 rounded-lg h-20 relative group">
-                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] bg-purple-900 text-white px-1.5 py-0.5 rounded font-bold">5h 25m</span>
-                  </div>
-                  <div className="w-full bg-purple-100 rounded-lg h-9"></div>
-                  <div className="w-full bg-purple-100 rounded-lg h-6"></div>
-                </div>
-                <div className="flex justify-between text-[10px] font-bold text-purple-900/40 mt-2 px-1">
-                  <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span className="text-purple-700">F</span><span>S</span>
-                </div>
-              </div>
-
-              {/* Time Tracker Donut Ring Component (Matches Screenshot Donut Gauge) */}
-              <div className="bg-white p-6 rounded-3xl border border-purple-100 shadow-sm flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-semibold text-purple-900/60 uppercase">Attendance</span>
-                    <span className="w-7 h-7 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold">↗</span>
-                  </div>
-                  <p className="text-2xl font-extrabold text-purple-950">Today</p>
-                </div>
-
-                <div className="my-2 flex items-center justify-center relative">
-                  <svg className="w-20 h-20 -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="38" strokeWidth="9" className="stroke-purple-100" fill="none" />
-                    <circle
-                      cx="50" cy="50" r="38" strokeWidth="9" fill="none"
-                      strokeDasharray={2 * Math.PI * 38}
-                      strokeDashoffset={attendanceMarked ? 0 : 2 * Math.PI * 38 * 0.4}
-                      strokeLinecap="round"
-                      className="stroke-purple-700 transition-all duration-700"
-                    />
-                  </svg>
-                  <span className="absolute text-xs font-extrabold text-purple-950">
-                    {attendanceMarked ? '100%' : 'Pending'}
-                  </span>
-                </div>
-
-                {attendanceMessage && <p className="text-[11px] font-semibold text-purple-700 text-center mb-1">{attendanceMessage}</p>}
-
-                {attendanceMarked ? (
-                  <div className="bg-purple-50 text-purple-700 text-xs font-bold py-2 rounded-2xl text-center border border-purple-200 flex items-center justify-center gap-1.5">
-                    <span>✓</span> Marked for Today
-                  </div>
-                ) : (
-                  <button
-                    onClick={handleMarkAttendance}
-                    className="w-full bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs py-2.5 rounded-2xl transition shadow-md shadow-purple-700/20"
-                  >
-                    Mark Attendance Now
-                  </button>
                 )}
               </div>
 
-            </div>
-
-            {/* Work Submission Form Card */}
-            <div className="bg-white rounded-3xl border border-purple-100 p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-5">
-                <div>
-                  <h3 className="text-lg font-extrabold text-purple-950">Submit Daily Proof of Work</h3>
-                  <p className="text-xs text-purple-800/60">Upload your work screenshot or GitHub repository link</p>
-                </div>
-                <span className="text-xs font-semibold bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
-                  Daily Requirement
-                </span>
+              {/* Avatar Stack */}
+              <div className="hidden md:flex items-center -space-x-2 bg-purple-50 p-1.5 rounded-2xl border border-purple-100">
+                <div className="w-7 h-7 rounded-full bg-purple-400 border-2 border-white flex items-center justify-center font-bold text-[10px] text-purple-950">A</div>
+                <div className="w-7 h-7 rounded-full bg-indigo-400 border-2 border-white flex items-center justify-center font-bold text-[10px] text-white">B</div>
+                <div className="w-7 h-7 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center font-bold text-[10px] text-emerald-950">C</div>
+                <span className="text-[10px] font-bold text-purple-900/60 pl-3 pr-1">10+</span>
               </div>
 
-              {message && (
-                <div className="bg-purple-50 border border-purple-200 text-purple-800 text-xs font-semibold p-3.5 rounded-2xl mb-4">
-                  {message}
-                </div>
-              )}
+              {/* Primary Action Button */}
+              <button
+                onClick={() => setShowSubmitModal(!showSubmitModal)}
+                className="bg-purple-950 hover:bg-purple-900 text-white px-4 py-2.5 rounded-2xl text-xs font-extrabold flex items-center gap-2 shadow-md shadow-purple-950/20 transition active:scale-95"
+              >
+                <span>👤</span> Submit Work Proof
+              </button>
+            </div>
+          </div>
 
-              <form onSubmit={handleSubmitWork} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Submission Modal Form if Toggled */}
+          {showSubmitModal && (
+            <div className="bg-white rounded-3xl p-6 border border-purple-200 shadow-xl space-y-4">
+              <div className="flex justify-between items-center pb-3 border-b border-purple-100">
+                <h3 className="text-sm font-extrabold text-purple-950">Submit Daily Work Verification</h3>
+                <button onClick={() => setShowSubmitModal(false)} className="text-purple-400 hover:text-purple-600 font-bold">✕</button>
+              </div>
+
+              <form onSubmit={handleSubmitWork} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-purple-900/70 mb-2">
-                    Work Screenshot Image
-                  </label>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-purple-900/60 mb-2">GitHub Repository URL</label>
+                  <input
+                    type="url"
+                    placeholder="https://github.com/username/repository"
+                    value={githubLink}
+                    onChange={(e) => setGithubLink(e.target.value)}
+                    className="w-full px-4 py-3 bg-purple-50/50 border border-purple-100 rounded-2xl text-xs font-semibold text-purple-950 focus:outline-none focus:ring-2 focus:ring-purple-600"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-purple-900/60 mb-2">Work Screenshot Image</label>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => setScreenshotFile(e.target.files[0])}
-                    className="w-full px-4 py-2.5 bg-purple-50/50 border border-purple-100 rounded-2xl text-xs text-purple-950 focus:outline-none focus:ring-2 focus:ring-purple-600 transition"
+                    className="w-full px-4 py-2.5 bg-purple-50/50 border border-purple-100 rounded-2xl text-xs text-purple-900 file:mr-4 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-700 file:text-white"
                   />
                 </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-purple-900/70 mb-2">
-                    GitHub Link (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="https://github.com/org/repo"
-                    value={githubLink}
-                    onChange={(e) => setGithubLink(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-purple-50/50 border border-purple-100 rounded-2xl text-xs text-purple-950 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-600 transition"
-                  />
-                </div>
-
-                <div className="sm:col-span-2">
+                <div className="md:col-span-2 flex justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowSubmitModal(false)}
+                    className="bg-purple-50 hover:bg-purple-100 text-purple-900 px-5 py-2.5 rounded-2xl font-bold text-xs"
+                  >
+                    Cancel
+                  </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full bg-purple-700 hover:bg-purple-800 disabled:opacity-50 text-white font-bold text-sm py-3 rounded-2xl transition shadow-md shadow-purple-700/25"
+                    className="bg-purple-700 hover:bg-purple-800 text-white px-6 py-2.5 rounded-2xl font-bold text-xs shadow-md shadow-purple-700/25"
                   >
-                    {submitting ? 'Submitting...' : 'Submit Work Report'}
+                    {submitting ? 'Uploading...' : 'Submit Work Report'}
                   </button>
                 </div>
               </form>
+              {message && <p className="text-xs font-bold text-emerald-600 pt-2">{message}</p>}
             </div>
+          )}
 
-          </div>
-
-          {/* Right Column (4 cols): Dark Onboarding Task Checklist Card (Matches Right Card in Screenshot) */}
-          <div className="lg:col-span-4 space-y-6">
+          {/* ================= TOP 3 METRIC CARDS ROW (Exact Tabor Study Design) ================= */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             
-            {/* Dark Purple Checklist Box (Matches Right Card in Screenshot) */}
-            <div className="bg-purple-900 text-white p-6 rounded-3xl shadow-xl flex flex-col justify-between min-h-[380px]">
+            {/* Card 1: Need to grade / Performance Score with Donut SVG */}
+            <div className="bg-white rounded-3xl p-5 border border-purple-100 shadow-sm flex flex-col justify-between">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <p className="text-[11px] font-bold text-purple-900/60">Need to grade</p>
+                  <p className="text-2xl font-extrabold text-purple-950 mt-1">{profile.performance_score}% <span className="text-xs text-purple-950 font-bold">Grade</span></p>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-600 mt-1">
+                    ↗ +4.56%
+                  </span>
+                </div>
+
+                {/* SVG Donut Ring Gauge */}
+                <div className="relative w-20 h-20 flex items-center justify-center shrink-0">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <path
+                      className="text-purple-100"
+                      strokeWidth="3.5"
+                      stroke="currentColor"
+                      fill="none"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      className="text-purple-600"
+                      strokeDasharray={`${profile.performance_score}, 100`}
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      stroke="currentColor"
+                      fill="none"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  </svg>
+                  <span className="absolute font-extrabold text-xs text-purple-950">{profile.performance_score}%</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-3 border-t border-purple-100 text-[11px] font-semibold text-purple-900/50">
+                <span className="w-5 h-5 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-[10px] font-bold">📑</span>
+                <span>yearly student exam test online system</span>
+              </div>
+            </div>
+
+            {/* Card 2: New Active Student / Attendance Status */}
+            <div className="bg-white rounded-3xl p-5 border border-purple-100 shadow-sm flex flex-col justify-between">
               <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-extrabold tracking-tight">Onboarding & Daily Tasks</h3>
-                  <span className="text-xs font-bold bg-white/20 px-2.5 py-1 rounded-full backdrop-blur-md">
-                    {attendanceMarked ? '2/2 Done' : '1/2 Pending'}
-                  </span>
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <p className="text-[11px] font-bold text-purple-900/60">New Active student</p>
+                    <p className="text-2xl font-extrabold text-purple-950 mt-1">536</p>
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-600 mt-1">
+                      ↗ +6.354%
+                    </span>
+                  </div>
+                  <div className="w-9 h-9 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-sm">
+                    👥
+                  </div>
                 </div>
-                
-                <p className="text-xs text-purple-200 mb-6">Complete daily tracking steps to maintain a high performance score.</p>
 
-                <div className="space-y-3.5">
-                  <div className="flex items-center justify-between p-3.5 bg-white/10 rounded-2xl border border-white/10 backdrop-blur-sm">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold ${attendanceMarked ? 'bg-emerald-500 text-white' : 'bg-white/20 text-purple-200'}`}>
-                        {attendanceMarked ? '✓' : '1'}
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold">Daily Attendance</p>
-                        <p className="text-[10px] text-purple-300">Mark check-in for today</p>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-purple-200">
-                      {attendanceMarked ? 'Completed' : 'Required'}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between p-3.5 bg-white/10 rounded-2xl border border-white/10 backdrop-blur-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-white/20 text-purple-200 flex items-center justify-center text-xs font-bold">
-                        2
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold">Submit Work Proof</p>
-                        <p className="text-[10px] text-purple-300">Screenshot or GitHub link</p>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-purple-200">
-                      Daily
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between p-3.5 bg-white/10 rounded-2xl border border-white/10 backdrop-blur-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-xs font-bold">
-                        ✓
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold">Maintain Score &gt; 60%</p>
-                        <p className="text-[10px] text-purple-300">Current score: {profile.performance_score}%</p>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">
-                      Active
-                    </span>
-                  </div>
+                {/* Vertical Equalizer Bar Graphic */}
+                <div className="flex items-end justify-between gap-1.5 h-10 mt-3 px-1">
+                  <div className="w-2 bg-purple-300 rounded-full h-4"></div>
+                  <div className="w-2 bg-purple-600 rounded-full h-8"></div>
+                  <div className="w-2 bg-purple-300 rounded-full h-5"></div>
+                  <div className="w-2 bg-purple-600 rounded-full h-9"></div>
+                  <div className="w-2 bg-purple-300 rounded-full h-3"></div>
+                  <div className="w-2 bg-purple-600 rounded-full h-7"></div>
+                  <div className="w-2 bg-purple-300 rounded-full h-4"></div>
+                  <div className="w-2 bg-purple-600 rounded-full h-10"></div>
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-white/10 text-center">
-                <p className="text-[11px] text-purple-300 font-medium">Craftive Performance Guarantee System</p>
+              <div className="flex items-center justify-between pt-3 border-t border-purple-100">
+                <span className="text-[11px] font-semibold text-purple-900/60">Attendance: {attendanceMarked ? '✓ Logged' : 'Pending'}</span>
+                <button
+                  onClick={handleMarkAttendance}
+                  disabled={attendanceMarked}
+                  className={`px-3 py-1 rounded-xl text-xs font-bold transition ${attendanceMarked ? 'bg-emerald-100 text-emerald-800' : 'bg-purple-700 hover:bg-purple-800 text-white'}`}
+                >
+                  {attendanceMarked ? 'Attended' : 'Check-in Now'}
+                </button>
               </div>
             </div>
 
-            {/* Notifications Box */}
-            {notifications.length > 0 && (
-              <div className="bg-white rounded-3xl border border-purple-100 p-6 shadow-sm">
-                <h3 className="text-base font-extrabold text-purple-950 mb-4 flex items-center justify-between">
-                  <span>Notifications</span>
-                  <span className="text-xs font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">{notifications.length}</span>
-                </h3>
-                <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
-                  {notifications.map((notif) => (
-                    <div key={notif.id || notif._id} className="p-3 bg-purple-50/60 rounded-2xl border border-purple-100/80">
-                      <p className="text-xs font-semibold text-purple-950">{notif.message}</p>
-                      <p className="text-[10px] text-purple-800/50 mt-1">
-                        {new Date(notif.created_at).toLocaleString()}
-                      </p>
-                    </div>
-                  ))}
+            {/* Card 3: Questions / Work Submissions Count */}
+            <div className="bg-white rounded-3xl p-5 border border-purple-100 shadow-sm flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <p className="text-[11px] font-bold text-purple-900/60">Questions & Tasks</p>
+                    <p className="text-2xl font-extrabold text-purple-950 mt-1">64</p>
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 mt-1">
+                      ↗ +2.56%
+                    </span>
+                  </div>
+
+                  {/* Soundwave Bar Visual */}
+                  <div className="flex items-center gap-1 h-8">
+                    <div className="w-1.5 bg-emerald-400 rounded-full h-4"></div>
+                    <div className="w-1.5 bg-emerald-500 rounded-full h-7"></div>
+                    <div className="w-1.5 bg-emerald-400 rounded-full h-5"></div>
+                    <div className="w-1.5 bg-emerald-600 rounded-full h-8"></div>
+                    <div className="w-1.5 bg-emerald-400 rounded-full h-4"></div>
+                  </div>
                 </div>
               </div>
-            )}
+
+              <div className="flex items-center gap-2 pt-3 border-t border-purple-100 text-[11px] font-semibold text-purple-900/50">
+                <span className="w-5 h-5 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-bold">❓</span>
+                <span>yearly student exam test online system monthly time remaining</span>
+              </div>
+            </div>
 
           </div>
 
-        </div>
+          {/* ================= MIDDLE ROW: 2 LARGE ANALYTICS CARDS ================= */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            
+            {/* Left 7 Columns: Exam Taken Times (Line Chart with Gradient Fill) */}
+            <div className="lg:col-span-7 bg-white rounded-3xl p-5 sm:p-6 border border-purple-100 shadow-sm flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-sm font-extrabold text-purple-950">Exam Taken Times</h3>
+                  <p className="text-[11px] font-semibold text-purple-900/50 mt-0.5">Taken records of last Years</p>
+                </div>
 
-        {/* Tabbed History Section (Work History & Attendance History) */}
-        <div className="bg-white rounded-3xl border border-purple-100 p-6 shadow-sm">
-          <div className="flex items-center justify-between border-b border-purple-100 pb-4 mb-6">
-            <div className="flex gap-2">
-              <button
-                onClick={() => setActiveTab('work')}
-                className={`px-5 py-2 rounded-2xl text-xs font-bold transition-all ${
-                  activeTab === 'work'
-                    ? 'bg-purple-700 text-white shadow-md shadow-purple-700/25'
-                    : 'bg-purple-50 text-purple-800/70 hover:text-purple-950'
-                }`}
-              >
-                Work History ({workHistory.length})
-              </button>
+                <div className="flex items-center gap-4 text-xs font-bold">
+                  <span className="flex items-center gap-1.5 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-purple-600"></span> Active Exams</span>
+                  <span className="flex items-center gap-1.5 text-purple-900/50"><span className="w-2.5 h-2.5 rounded-full bg-purple-200"></span> Active Exam Takers</span>
+                  <button className="bg-purple-50 border border-purple-100 px-3 py-1 rounded-xl text-[11px] font-bold text-purple-900">
+                    📅 Monthly ▾
+                  </button>
+                </div>
+              </div>
 
+              {/* Line Chart Graphic with Smooth Curve */}
+              <div className="relative h-48 w-full mt-2">
+                <svg className="w-full h-full overflow-visible" viewBox="0 0 500 150" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#7e22ce" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#7e22ce" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Vertical Month Background Bars */}
+                  <rect x="20" y="10" width="12" height="130" fill="#f3eefb" rx="4" />
+                  <rect x="60" y="10" width="12" height="130" fill="#f3eefb" rx="4" />
+                  <rect x="100" y="10" width="12" height="130" fill="#f3eefb" rx="4" />
+                  <rect x="140" y="10" width="12" height="130" fill="#f3eefb" rx="4" />
+                  <rect x="180" y="10" width="12" height="130" fill="#f3eefb" rx="4" />
+                  <rect x="220" y="10" width="12" height="130" fill="#f3eefb" rx="4" />
+                  <rect x="260" y="10" width="12" height="130" fill="#f3eefb" rx="4" />
+                  <rect x="300" y="10" width="12" height="130" fill="#f3eefb" rx="4" />
+                  <rect x="340" y="10" width="12" height="130" fill="#f3eefb" rx="4" />
+                  <rect x="380" y="10" width="12" height="130" fill="#f3eefb" rx="4" />
+                  <rect x="420" y="10" width="12" height="130" fill="#f3eefb" rx="4" />
+                  <rect x="460" y="10" width="12" height="130" fill="#f3eefb" rx="4" />
+
+                  {/* Smooth Filled Gradient Area */}
+                  <path
+                    d="M 20 100 Q 60 90, 100 95 T 180 80 T 260 40 T 340 85 T 420 60 T 480 80 L 480 140 L 20 140 Z"
+                    fill="url(#purpleGradient)"
+                  />
+
+                  {/* Smooth Curve Line */}
+                  <path
+                    d="M 20 100 Q 60 90, 100 95 T 180 80 T 260 40 T 340 85 T 420 60 T 480 80"
+                    fill="none"
+                    stroke="#7e22ce"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                  />
+
+                  {/* Glowing Data Dots */}
+                  <circle cx="260" cy="40" r="5" fill="#7e22ce" stroke="#ffffff" strokeWidth="2" />
+                  <circle cx="340" cy="85" r="4" fill="#7e22ce" />
+                  <circle cx="420" cy="60" r="4" fill="#7e22ce" />
+                </svg>
+
+                {/* X-Axis Ticks */}
+                <div className="flex justify-between text-[10px] font-bold text-purple-900/40 mt-2 px-1">
+                  <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+                  <span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right 5 Columns: Average Results For Test Questions (Segmented Skill Progress Bars) */}
+            <div className="lg:col-span-5 bg-white rounded-3xl p-5 sm:p-6 border border-purple-100 shadow-sm flex flex-col justify-between">
+              <div>
+                <h3 className="text-sm font-extrabold text-purple-950 mb-3">Average Results For Test Questions</h3>
+
+                {/* Indicator Badges */}
+                <div className="flex flex-wrap gap-3 text-[10px] font-bold mb-5">
+                  <span className="flex items-center gap-1 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-purple-600"></span> Easy questions</span>
+                  <span className="flex items-center gap-1 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Medium questions</span>
+                  <span className="flex items-center gap-1 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Difficult</span>
+                  <span className="flex items-center gap-1 text-purple-900"><span className="w-2.5 h-2.5 rounded-full bg-orange-600"></span> Hard</span>
+                </div>
+
+                {/* Horizontal Segmented Progress Bars */}
+                <div className="space-y-4">
+                  {/* Subject 1 */}
+                  <div>
+                    <p className="text-xs font-bold text-purple-950 mb-1.5">Mathematic</p>
+                    <div className="flex h-3 rounded-full overflow-hidden bg-purple-50">
+                      <div className="bg-purple-600 w-[40%]"></div>
+                      <div className="bg-emerald-400 w-[30%] border-l-2 border-white"></div>
+                      <div className="bg-amber-400 w-[10%] border-l-2 border-white"></div>
+                      <div className="bg-orange-500 w-[20%] border-l-2 border-white"></div>
+                    </div>
+                  </div>
+
+                  {/* Subject 2 */}
+                  <div>
+                    <p className="text-xs font-bold text-purple-950 mb-1.5">English 1</p>
+                    <div className="flex h-3 rounded-full overflow-hidden bg-purple-50">
+                      <div className="bg-purple-600 w-[55%]"></div>
+                      <div className="bg-emerald-400 w-[10%] border-l-2 border-white"></div>
+                      <div className="bg-amber-400 w-[20%] border-l-2 border-white"></div>
+                      <div className="bg-orange-500 w-[15%] border-l-2 border-white"></div>
+                    </div>
+                  </div>
+
+                  {/* Subject 3 */}
+                  <div>
+                    <p className="text-xs font-bold text-purple-950 mb-1.5">Science 2</p>
+                    <div className="flex h-3 rounded-full overflow-hidden bg-purple-50">
+                      <div className="bg-purple-600 w-[15%]"></div>
+                      <div className="bg-emerald-400 w-[45%] border-l-2 border-white"></div>
+                      <div className="bg-amber-400 w-[25%] border-l-2 border-white"></div>
+                      <div className="bg-orange-500 w-[15%] border-l-2 border-white"></div>
+                    </div>
+                  </div>
+
+                  {/* Subject 4 */}
+                  <div>
+                    <p className="text-xs font-bold text-purple-950 mb-1.5">Economics</p>
+                    <div className="flex h-3 rounded-full overflow-hidden bg-purple-50">
+                      <div className="bg-purple-600 w-[35%]"></div>
+                      <div className="bg-emerald-400 w-[25%] border-l-2 border-white"></div>
+                      <div className="bg-amber-400 w-[30%] border-l-2 border-white"></div>
+                      <div className="bg-orange-500 w-[10%] border-l-2 border-white"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pass Mark Scale at Bottom */}
+              <div className="flex justify-between text-[10px] font-bold text-purple-900/40 border-t border-purple-100 pt-3 mt-4">
+                <span>Pass Mark:</span>
+                <span>10</span><span>20</span><span>30</span><span>40</span><span>50</span><span>60</span><span>70</span><span>80</span><span>90</span><span>100</span>
+              </div>
+            </div>
+
+          </div>
+
+          {/* ================= BOTTOM DATA TABLE: BROWSE TEST RESULTS ================= */}
+          <div className="bg-white rounded-3xl p-5 sm:p-6 border border-purple-100 shadow-sm">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-sm font-extrabold text-purple-950">Browse test results</h3>
               <button
-                onClick={() => setActiveTab('attendance')}
-                className={`px-5 py-2 rounded-2xl text-xs font-bold transition-all ${
-                  activeTab === 'attendance'
-                    ? 'bg-purple-700 text-white shadow-md shadow-purple-700/25'
-                    : 'bg-purple-50 text-purple-800/70 hover:text-purple-950'
-                }`}
+                onClick={() => setShowSubmitModal(true)}
+                className="bg-purple-50 hover:bg-purple-100 border border-purple-100 text-purple-900 px-3.5 py-2 rounded-2xl text-xs font-bold flex items-center gap-2 transition"
               >
-                Attendance Records ({attendanceHistory.length})
+                ✉️ Send certificates / Submit Work
               </button>
+            </div>
+
+            {/* Data Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs font-semibold">
+                <thead>
+                  <tr className="border-b border-purple-100 text-purple-900/50 pb-3">
+                    <th className="p-3 w-10"><input type="checkbox" className="rounded" /></th>
+                    <th className="p-3">Name</th>
+                    <th className="p-3">Total score</th>
+                    <th className="p-3">Score Reasoning</th>
+                    <th className="p-3">Time</th>
+                    <th className="p-3">Score Analysis</th>
+                    <th className="p-3">Start Date</th>
+                    <th className="p-3">Score Generic</th>
+                    <th className="p-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-purple-50">
+                  
+                  {/* Row 1: Active User */}
+                  <tr className="hover:bg-purple-50/40 transition">
+                    <td className="p-3"><input type="checkbox" className="rounded" defaultChecked /></td>
+                    <td className="p-3 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-purple-700 text-white font-extrabold flex items-center justify-center text-xs">
+                        {profile.name.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-extrabold text-purple-950">{profile.name}</p>
+                        <p className="text-[10px] text-purple-900/50">{profile.email}</p>
+                      </div>
+                    </td>
+                    <td className="p-3">
+                      <span className="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-xl text-[11px] font-extrabold">
+                        {profile.performance_score}%
+                      </span>
+                    </td>
+                    <td className="p-3">
+                      <span className="bg-purple-50 text-purple-800 border border-purple-100 px-2.5 py-1 rounded-xl text-[11px] font-bold">
+                        📊 50% (1/2)
+                      </span>
+                    </td>
+                    <td className="p-3 font-mono text-purple-900/70">00:53</td>
+                    <td className="p-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 bg-purple-100 h-2 rounded-full overflow-hidden">
+                          <div className="bg-purple-600 h-full w-[85%]"></div>
+                        </div>
+                        <span className="text-[10px] font-bold text-purple-900">100%</span>
+                      </div>
+                    </td>
+                    <td className="p-3 text-purple-900/70">Jan 20, 2026</td>
+                    <td className="p-3">
+                      <span className="bg-pink-50 text-pink-700 border border-pink-100 px-2.5 py-1 rounded-xl text-[11px] font-bold">
+                        0% (0/2)
+                      </span>
+                    </td>
+                    <td className="p-3 text-right space-x-2">
+                      <button className="p-1.5 hover:bg-purple-100 rounded-lg text-purple-700">🗑️</button>
+                      <button className="p-1.5 hover:bg-purple-100 rounded-lg text-purple-700">✏️</button>
+                      <button className="p-1.5 hover:bg-purple-100 rounded-lg text-purple-700">•••</button>
+                    </td>
+                  </tr>
+
+                  {/* Row 2: Secondary Employee */}
+                  <tr className="hover:bg-purple-50/40 transition">
+                    <td className="p-3"><input type="checkbox" className="rounded" /></td>
+                    <td className="p-3 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-teal-600 text-white font-extrabold flex items-center justify-center text-xs">
+                        A
+                      </div>
+                      <div>
+                        <p className="font-extrabold text-purple-950">Anwar Hussen</p>
+                        <p className="text-[10px] text-purple-900/50">anwar@taborstudy.com</p>
+                      </div>
+                    </td>
+                    <td className="p-3">
+                      <span className="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-xl text-[11px] font-extrabold">
+                        92.7%
+                      </span>
+                    </td>
+                    <td className="p-3">
+                      <span className="bg-purple-50 text-purple-800 border border-purple-100 px-2.5 py-1 rounded-xl text-[11px] font-bold">
+                        📊 100% (2/2)
+                      </span>
+                    </td>
+                    <td className="p-3 font-mono text-purple-900/70">01:00</td>
+                    <td className="p-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 bg-purple-100 h-2 rounded-full overflow-hidden">
+                          <div className="bg-emerald-500 h-full w-[95%]"></div>
+                        </div>
+                        <span className="text-[10px] font-bold text-purple-900">00%</span>
+                      </div>
+                    </td>
+                    <td className="p-3 text-purple-900/70">Jan 20, 2026</td>
+                    <td className="p-3">
+                      <span className="bg-blue-50 text-blue-700 border border-blue-100 px-2.5 py-1 rounded-xl text-[11px] font-bold">
+                        0% (0/2)
+                      </span>
+                    </td>
+                    <td className="p-3 text-right space-x-2">
+                      <button className="p-1.5 hover:bg-purple-100 rounded-lg text-purple-700">🗑️</button>
+                      <button className="p-1.5 hover:bg-purple-100 rounded-lg text-purple-700">✏️</button>
+                      <button className="p-1.5 hover:bg-purple-100 rounded-lg text-purple-700">•••</button>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
             </div>
           </div>
 
-          {activeTab === 'work' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {workHistory.length === 0 && <p className="text-purple-800/50 text-xs font-medium col-span-full py-4 text-center">No submissions recorded yet.</p>}
-              {workHistory.map((item) => (
-                <div key={item.id || item._id} className="p-4 bg-purple-50/40 rounded-2xl border border-purple-100 flex flex-col justify-between">
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-bold text-purple-950">
-                        {new Date(item.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
-                      </span>
-                      <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">
-                        Submitted
-                      </span>
-                    </div>
-                    {item.github_link && (
-                      <p className="text-xs text-purple-700 truncate font-mono mt-1">
-                        🔗 {item.github_link}
-                      </p>
-                    )}
-                  </div>
-                  <div className="mt-3 pt-2 border-t border-purple-100/60 flex gap-3 text-xs">
-                    {item.screenshot_url && (
-                      <a href={item.screenshot_url} target="_blank" rel="noreferrer" className="text-purple-700 font-semibold hover:underline">
-                        View Screenshot ↗
-                      </a>
-                    )}
-                    {item.github_link && (
-                      <a href={item.github_link} target="_blank" rel="noreferrer" className="text-purple-700 font-semibold hover:underline">
-                        GitHub ↗
-                      </a>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+        </main>
+      </div>
 
-          {activeTab === 'attendance' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-              {attendanceHistory.length === 0 && <p className="text-purple-800/50 text-xs font-medium col-span-full py-4 text-center">No attendance records found.</p>}
-              {attendanceHistory.map((item) => (
-                <div key={item.id || item._id} className="p-3.5 bg-purple-50/40 rounded-2xl border border-purple-100 flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold text-purple-950">
-                      {new Date(item.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </p>
-                    <p className="text-[10px] text-purple-600 font-medium">Marked Check-in</p>
-                  </div>
-                  <span className="w-7 h-7 rounded-full bg-purple-700 text-white flex items-center justify-center text-xs font-bold">
-                    ✓
-                  </span>
-                </div>
-              ))}
+      {/* ================= FLOATING BOTTOM BRIEF BANNER (Matching Reference Image Banner) ================= */}
+      {showBanner && (
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-white/95 backdrop-blur-2xl rounded-3xl border border-purple-200 shadow-2xl p-4 sm:px-6 sm:py-3.5 flex items-center justify-between gap-6 max-w-2xl w-[92vw] text-xs font-bold text-purple-950">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-base shrink-0">
+              📝
             </div>
-          )}
+            <div>
+              <p className="font-extrabold text-purple-950">
+                Start a Project Brief <span className="text-purple-900/60 font-semibold hidden sm:inline">Tell us what you need and find the right talent.</span>
+              </p>
+            </div>
+          </div>
 
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={() => setShowSubmitModal(true)}
+              className="bg-white hover:bg-purple-50 text-purple-950 border border-purple-200 px-4 py-2 rounded-2xl text-xs font-extrabold shadow-sm transition active:scale-95"
+            >
+              Get Started
+            </button>
+            <button
+              onClick={() => setShowBanner(false)}
+              className="text-purple-400 hover:text-purple-600 text-sm font-bold"
+            >
+              ✕
+            </button>
+          </div>
         </div>
+      )}
 
-      </main>
     </div>
   );
 }

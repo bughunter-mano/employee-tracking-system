@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import logoImg from '../assets/logo.jpg';
 
 function Navbar({ userName, role }) {
   const navigate = useNavigate();
@@ -13,20 +14,18 @@ function Navbar({ userName, role }) {
   const isAdmin = role === 'admin';
 
   return (
-    <header className="bg-white/80 backdrop-blur-md border-b border-purple-100/80 sticky top-0 z-50 px-6 py-3.5">
+    <header className="bg-white/85 backdrop-blur-md border-b border-purple-100/80 sticky top-0 z-50 px-6 py-3.5 shadow-sm">
       <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-4">
         
         {/* Brand Logo */}
         <div 
           onClick={() => navigate(isAdmin ? '/admin' : '/dashboard')}
-          className="flex items-center gap-2.5 cursor-pointer group"
+          className="flex items-center gap-3 cursor-pointer group"
         >
-          <div className="w-10 h-10 bg-gradient-to-tr from-purple-700 via-indigo-600 to-purple-500 rounded-2xl flex items-center justify-center font-bold text-xl text-white shadow-md shadow-purple-500/20 group-hover:scale-105 transition-transform">
-            ⚡
-          </div>
+          <img src={logoImg} alt="AuraPulse OS" className="w-10 h-10 rounded-2xl shadow-md object-cover border border-purple-200 group-hover:scale-105 transition-transform" />
           <div>
             <span className="font-extrabold text-xl tracking-tight text-purple-950">
-              EmpTrack <span className="text-purple-600 font-semibold text-sm">Labs</span>
+              AuraPulse <span className="text-purple-600 font-semibold text-sm">OS</span>
             </span>
           </div>
         </div>
