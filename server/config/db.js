@@ -11,7 +11,7 @@ const connectDB = async () => {
     console.log(`Primary MongoDB not reachable (${err.message}). Starting MongoMemoryServer fallback...`);
     try {
       const { MongoMemoryServer } = require('mongodb-memory-server');
-      const mongoServer = await MongoMemoryServer.create();
+      const mongoServer = await MongoMemoryServer.create({ binary: { version: '6.0.14' } });
       uri = mongoServer.getUri();
       const conn = await mongoose.connect(uri);
       console.log(`InMemory MongoDB Connected: ${conn.connection.host}`);
